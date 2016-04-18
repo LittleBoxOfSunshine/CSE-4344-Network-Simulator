@@ -16,12 +16,13 @@ void Node::buildRoutes() {
 }
 
 // Needed to create vector<Node>
-Node::Node() { }
+Node::Node() { this->uniqueID = ++(Node::sequenceID); }
 
-Node::Node(unsigned int uniqueID, std::vector<Node *> &neighbors)
-    : uniqueID{uniqueID}
-    , neighbors{neighbors}
-    { }
+Node::Node(unsigned int uniqueID) : uniqueID{uniqueID} { }
+
+void Node::setNeighbors(std::vector<Node *> &neighbors) {
+    this->neighbors = neighbors;
+}
 
 void Node::receivePacket(const Packet &packet, const int &tick) {
     this->inputBuffer.push(packet);
