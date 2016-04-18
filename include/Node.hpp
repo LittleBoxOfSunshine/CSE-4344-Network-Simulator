@@ -22,11 +22,11 @@ private:
     unsigned int uniqueID;
     unsigned short groupID;
     std::vector<Node*> neighbors; //constant weight of 1 from each node to the next
-    std::vector<Node*> allNodes;
+    std::vector<Node*> allNodes; //list of all nodes in the network for Dijkstra's
     std::vector<Packet> packetCache;
     std::queue<Packet> inputBuffer;
     std::priority_queue<Packet> outputBuffer;
-    std::unordered_map<unsigned int, Node*> routingTable;
+    std::unordered_map<Node*, unsigned int> routingTable;
     bool receivedCTS;
     bool receivedRTS;
 
@@ -59,6 +59,8 @@ public:
                     // Called by simulator to run the node's actions during the current time slot (tick)
     void receiveRTS();
     void receiveCTS();
+
+    void printRoutingTable();
 };
 
 #endif //SIMULATOR_NODE_HPP

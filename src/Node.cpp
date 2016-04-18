@@ -1,8 +1,11 @@
 //
 // Created by cahenk on 4/17/16.
 //
+#include <algorithm>
+#include <climits>
 
 #include "Node.hpp"
+#include "Simulator.hpp"
 
 unsigned int Node::sequenceID = 1;
 
@@ -16,16 +19,79 @@ void Node::sendPacket(const Packet & packet, const int &tick) {
 
 //written by Eric Smith
 void Node::buildRoutes() {
-    //dij gives shortest from one node to every
-    //only concerened with first part from a to b
-    //know paths, easier to calculate
-    //dijstras has a sense of when it's over
-    //its recursive
+    buildTopology();
+
+    //initialize routingTable
+    for(int i=0;i<allNodes.size();i++)
+        routingTable.insert({allNodes.at(i), 4294967295});
+
+    routingTable.at(this) = 0; //set this as root node
+
+    std::vector<Node*> pathKnown; //list of nodes whose least cost path is known
+    pathKnown.push_back(this);
+
+    //for all nodes adjacent to root (this), set their distances to 1
+    for(int i=0;i<allNodes.size();i++){
+        Node* v = allNodes.at(i);
+
+        //current node is adjacent to root (this)
+        if( std::find(this->getNeighbors().begin(), this->getNeighbors().end(), v) != this->getNeighbors().end() )
+            routingTable.at(v) = 1;
+    }
+
+    //loop until all least cost paths are known
+    while( pathKnown.size() != allNodes.size() ){
+        Node* w;
+        unsigned int leastCost = 4294967295;
+
+        //find a node not in pathKnown with the minimum current cost
+        for(int i=0;i<allNodes.size();i++){
+            int curValue = routingTable.at( allNodes.at(i) );
+
+            if( (std::find(pathKnown.begin(), pathKnown.end(), allNodes.at(i)) == pathKnown.end()) && curValue < leastCost ){
+                w = allNodes.at(i);
+                leastCost = curValue;
+            }
+        }
+
+        //add w to list of known shortest paths
+        pathKnown.push_back(w);
+
+        //update cost of path for all v adjacent to w and not in pathKnown
+        for(int i=0;i<w->getNeighbors().size();i++){
+            Node* v = w->getNeighbors().at(i);
+
+            if( std::find(pathKnown.begin(), pathKnown.end(), v) == pathKnown.end() ){
+                routingTable.at(v) = std::min(routingTable.at(v), (routingTable.at(w) + 1));
+            }
+        }
+    }
 
 }
 
+//BFS to find all the nodes in the network
 void Node::buildTopology(){
+    Queue<Node*> frontier;
 
+    //mark root visited
+    allNodes.push_back(this);
+    frontier.push(this);
+
+    while( !frontier.getQueue().empty() ){
+        Node* n = frontier.pop();
+
+        for(int i=0;i<n->getNeighbors().size();i++){
+            Node* nPrime = n->getNeighbors().at(i);
+
+            //allNodes doesn't contain nPrime (nPrime hasn't been visited)
+            if(std::find(allNodes.begin(), allNodes.end(), nPrime) == allNodes.end()){
+                frontier.push(nPrime);
+
+                //mark nPrime visited
+                allNodes.push_back(nPrime);
+            }
+        }
+    }
 }
 
 
@@ -91,4 +157,14 @@ void Node::transmitterAction() {
 
 Packet* Node::processorAction() {
     // Can Decode 1 packet, or encode 1 packet
+}
+
+void Node::printRoutingTable(){
+    std::cout << " ---- Routing Table ----" << std::endl;
+    std::cout << "| Unique ID | Distance |" << std::endl;
+    std::cout << "------------------------" << std::endl;
+    for (auto& x: routingTable) {$
+        std::cout << x.first->getUniqueID() << " | " << x.second << std::endl;
+    }
+    std::cout << "------------------------" << std::endl;
 }
