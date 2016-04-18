@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <fstream>
 
 #include "matrix.hpp"
 #include "Simulator.hpp"
@@ -17,13 +18,24 @@ int main( int argc, char * argv[] ) {
 
     // Check that required command line args were supplied
     if( argc == 3 ){
+        // Load config
+        std::ifstream configFile(argv[2], ios::in);
+
+
+        // Load messages
+        std::ifstream messageFile(argv[1], ios::in);
+
+
+        // Create random network
+
+        // Create & start simulator
 
         return 0;
     }
     // Invalid command line arguments, alert user and halt program
     else{
         std::cout << "ERROR: INVALID COMMAND LINE ARGS..." << std::endl
-                  << "       Proper Usage: <exec_cmd> <message_file_path> <topology_conf_path>" << std::endl;
+                  << "       Proper Usage: <exec_cmd> <topology_conf_path> <message_file_path>" << std::endl;
     }
 }
 
