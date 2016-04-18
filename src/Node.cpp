@@ -18,14 +18,25 @@ void Node::sendPacket(const Packet & packet, const int &tick) {
 }
 
 //written by Eric Smith
+//Dijkstra's Algorithm
 void Node::buildRoutes() {
     buildTopology();
 
-    //initialize routingTable
-    for(int i=0;i<allNodes.size();i++)
-        routingTable.insert({allNodes.at(i), ULONG_MAX});
+    std::cout << "allNodes:";
+    for(auto x:allNodes)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
 
-    routingTable.at(this) = 0; //set this as root node
+    std::unordered_map<Node*, std::tuple<unsigned short, int, Node*> >initialRouting;
+
+    //initialize routingTable
+    for(int i=0;i<allNodes.size();i++) {
+        //destination, # hops, 1st hop
+        std::tuple<unsigned short, int, Node*> tempTuple(allNodes.at(i)->getUniqueID(), USHRT_MAX, allNodes.at(i));
+        initialRouting.insert({allNodes.at(i),tempTuple});
+    }
+
+    initialRouting.at(this) = std::make_tuple(this->getUniqueID(), 0, this); //set this as root node
 
     std::vector<Node*> pathKnown; //list of nodes whose least cost path is known
     pathKnown.push_back(this);
@@ -36,17 +47,18 @@ void Node::buildRoutes() {
 
         //current node is adjacent to root (this)
         if( std::find(this->getNeighbors().begin(), this->getNeighbors().end(), v) != this->getNeighbors().end() )
-            routingTable.at(v) = 1;
+            initialRouting.at(v) = std::make_tuple(v->getUniqueID(), 1, v);
     }
 
     //loop until all least cost paths are known
     while( pathKnown.size() != allNodes.size() ){
         Node* w;
-        unsigned int leastCost = ULONG_MAX;
+        unsigned int leastCost = USHRT_MAX;
 
         //find a node not in pathKnown with the minimum current cost
         for(int i=0;i<allNodes.size();i++){
-            int curValue = routingTable.at( allNodes.at(i) );
+            std::tuple<unsigned short, int, Node*> tempTuple = initialRouting.at( allNodes.at(i) );
+            int curValue = std::get<1>(tempTuple);
 
             if( (std::find(pathKnown.begin(), pathKnown.end(), allNodes.at(i)) == pathKnown.end()) && curValue < leastCost ){
                 w = allNodes.at(i);
@@ -62,10 +74,39 @@ void Node::buildRoutes() {
             Node* v = w->getNeighbors().at(i);
 
             if( std::find(pathKnown.begin(), pathKnown.end(), v) == pathKnown.end() ){
-                routingTable.at(v) = std::min(routingTable.at(v), (routingTable.at(w) + 1));
+                std::tuple<unsigned short, int, Node*> vTuple = initialRouting.at(v);
+                int vDist = std::get<1>(vTuple);
+
+                std::tuple<unsigned short, int, Node*> wTuple = initialRouting.at(w);
+                int wDist = std::get<1>(wTuple);
+
+                int minDist = std::min(vDist, (wDist + 1));
+
+                Node* firstHop = std::get<2>(vTuple);
+
+                //set 1st hop if
+                if((wDist + 1) < vDist && firstHop == v){
+                    firstHop = w;
+                }
+
+                initialRouting.at(v) = std::make_tuple(std::get<0>(vTuple), minDist, firstHop);
             }
         }
     }
+
+    std::cout << "pathKnown:";
+    for(auto x:pathKnown)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
+
+    std::cout << "DestID | NumHops | FirstHopID" << std::endl;
+    for(auto& x : initialRouting ){
+        std::tuple<unsigned short, int, Node*> tempT = x.second;
+        int dist = std::get<1>(tempT);
+
+        std::cout << x.first->getUniqueID() << "\t\t\t" << dist << "\t\t\t" << std::get<2>(tempT)->getUniqueID() << std::endl;
+    }
+
 
 }
 
@@ -99,7 +140,7 @@ void Node::buildTopology(){
 // Needed to create vector<Node>
 Node::Node() { this->uniqueID = ++(Node::sequenceID); }
 
-Node::Node(unsigned int uniqueID) : uniqueID{uniqueID} { }
+Node::Node(unsigned short uniqueID) : uniqueID{uniqueID} { }
 
 void Node::setNeighbors(std::vector<Node *> &neighbors) {
     this->neighbors = neighbors;
@@ -109,7 +150,7 @@ std::vector<Node*> & Node::getNeighbors(){
     return this->neighbors;
 }
 
-unsigned int Node::getUniqueID(){
+unsigned short Node::getUniqueID(){
     return this->uniqueID;
 }
 
@@ -161,6 +202,7 @@ Packet* Node::processorAction() {
 }
 
 void Node::printRoutingTable(){
+    /*
     std::cout << " ---- Routing Table ----" << std::endl;
     std::cout << "| Unique ID | Distance |" << std::endl;
     std::cout << "------------------------" << std::endl;
@@ -171,4 +213,5 @@ void Node::printRoutingTable(){
             std::cout << x.first->getUniqueID() << " | " << x.second << std::endl;
     }
     std::cout << "------------------------" << std::endl;
+     */
 }
