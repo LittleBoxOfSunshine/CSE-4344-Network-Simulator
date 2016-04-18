@@ -41,8 +41,6 @@ public:
     void log(std::string logString);
     void log(std::vector<std::string> logVector);
 
-    void start(); // TODO: Eric
-
 
 };
 

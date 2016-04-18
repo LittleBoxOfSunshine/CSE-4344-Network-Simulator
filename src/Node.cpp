@@ -14,7 +14,9 @@ void Node::sendPacket(const Packet & packet, const int &tick) {
         n->receivePacket(packet, tick);
 }
 
+//written by Eric Smith
 void Node::buildRoutes() {
+    
 
 }
 
