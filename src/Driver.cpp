@@ -102,6 +102,53 @@ int main(){
     iNeighbors.push_back((&G));
     I.setNeighbors(iNeighbors);
 
+    std::cout << "A: ";
+    for(auto x:aNeighbors)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
+
+    std::cout << "B: ";
+    for(auto x:bNeighbors)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
+
+    std::cout << "C: ";
+    for(auto x:cNeighbors)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
+
+    std::cout << "D: ";
+    for(auto x:dNeighbors)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
+
+    std::cout << "E: ";
+    for(auto x:eNeighbors)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
+
+    std::cout << "F: ";
+    for(auto x:fNeighbors)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
+
+    std::cout << "G: ";
+    for(auto x:gNeighbors)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
+
+    std::cout << "H: ";
+    for(auto x:hNeighbors)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
+
+    std::cout << "I: ";
+    for(auto x:iNeighbors)
+        std::cout << x->getUniqueID() << ", ";
+    std::cout << std::endl;
+
+    std::cout << "------------" << std::endl;
+
     A.buildRoutes();
     //A.printRoutingTable();
 

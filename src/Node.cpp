@@ -86,8 +86,16 @@ void Node::buildRoutes() {
                 Node* firstHop = std::get<2>(vTuple);
 
                 //set 1st hop if
-                if((wDist + 1) > vDist && firstHop == v){
-                    firstHop = w;
+                if( (wDist + 1) < vDist ){
+                    //std::cout << "FirstHop is " << firstHop->getUniqueID() << " replacing with " << w->getUniqueID() << std::endl;
+                    //std::cout << v->getUniqueID() << std::endl;
+                    Node* targetFirstHop = w;
+                    while( std::find(this->getNeighbors().begin(), this->getNeighbors().end(), targetFirstHop) == this->getNeighbors().end() ){
+                        std::tuple<unsigned short, int, Node*> target = initialRouting.at(targetFirstHop);
+                        targetFirstHop = std::get<2>(target);
+                    }
+
+                    firstHop = targetFirstHop;
                 }
 
                 initialRouting.at(v) = std::make_tuple(std::get<0>(vTuple), minDist, firstHop);
@@ -123,10 +131,6 @@ void Node::buildTopology(){
     while( !frontier.empty() ){
         for(auto &n : frontier.front()->getNeighbors() ){
 
-            std::cout << n->getUniqueID() << ": ";
-            for(auto x:n->getNeighbors())
-                std::cout << x->getUniqueID() << ", ";
-            std::cout << "-----------" << std::endl;
             //allNodes doesn't contain nPrime (nPrime hasn't been visited)
             if(std::find(allNodes.begin(), allNodes.end(), n) == allNodes.end()){
                 frontier.push(n);
