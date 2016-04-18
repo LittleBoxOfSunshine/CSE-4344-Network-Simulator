@@ -22,6 +22,14 @@ private:
     std::ofstream out;
     Queue<std::string> queue;
 
+    // TODO: member to hold output buffer (queue) used by log thread
+    std::vector<Node> nodes;
+    unsigned int currentTick;
+    std::vector<std::pair<unsigned int, Packet>> unaddedPackets; // Must be presorted
+    int packetIndex;
+
+    void runTick();
+
 public:
     Simulator();
     Simulator(signed int sleepTime);
@@ -32,6 +40,11 @@ public:
     void handler();
     void log(std::string logString);
     void log(std::vector<std::string> logVector);
+
+    Simulator(std::vector<Node> & nodes, std::vector<std::pair<unsigned int, Packet>> packets);
+    void start(); // TODO: Eric
+
+
 };
 
 

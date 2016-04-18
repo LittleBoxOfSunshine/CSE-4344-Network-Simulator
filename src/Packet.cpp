@@ -5,25 +5,30 @@
 #include "Packet.hpp"
 
 Packet::Packet() {
-    this->source = -1;
-    this->destination = -1;
+    this->source = 0;
+    this->destination = 0;
     this->highPriority = false;
+    this->groupID = 0;
 }
 
-Packet::Packet(int source, int destination, uint8_t* message, bool highPriority)
+Packet::Packet(unsigned long source, unsigned long destination, uint8_t* message, bool highPriority,
+               unsigned short groupID)
         : source{source}
         , destination{destination}
         , message{message}
         , highPriority{highPriority}
+        , groupID{0}
     {}
 
 uint8_t* Packet::getMessage() { return this->message; }
 
-int Packet::getSource() { return this->source; }
+unsigned long Packet::getSource() { return this->source; }
 
-int Packet::getDestination() { return this->destination; }
+unsigned long Packet::getDestination() { return this->destination; }
 
 bool Packet::getPriority() { return this->highPriority; }
+
+unsigned short Packet::getGroupID() { return this->groupID; }
 
 bool Packet::isHighPriority() { return this->highPriority; }
 
@@ -31,9 +36,9 @@ bool Packet::isLowPriority() { return !this->highPriority; }
 
 void Packet::setMessage(uint8_t* message) { this->message = message; }
 
-void Packet::setSource(int source) { this->source = source; }
+void Packet::setSource(unsigned long source) { this->source = source; }
 
-void Packet::setDestination(int destination) { this->destination = destination; }
+void Packet::setDestination(unsigned long destination) { this->destination = destination; }
 
 void Packet::setPriority(bool highPriority) { this->highPriority = highPriority; }
 
@@ -41,19 +46,21 @@ void Packet::setHighPriority() { this->highPriority = true; }
 
 void Packet::setLowPriority() { this->highPriority = false; }
 
+void Packet::setGroupID(unsigned short groupID) { this->groupID = groupID; }
+
 Packet& Packet::operator*(const int &fieldConstant) {
     this->source *= fieldConstant;
-    // TODO: Determine if destination will be encoded or prepended to messages (more data but prevents uneeded decode)
-    this->destination *= fieldConstant;
+
+    // Destination is unmodified by the encoding process
 
     for(int i = 0; i < Packet::MESSAGE_SIZE; i++)
         this->message[i] *= fieldConstant;
 }
 
 Packet& Packet::operator+(const Packet & rhs) {
-    this->source += rhs.destination;
-    // TODO: Determine if destination will be encoded or prepended to messages (more data but prevents uneeded decode)
-    this->destination += rhs.destination;
+    this->source += rhs.source;
+
+    // Destination is unmodified by the encoding process
 
     for(int i = 0; i < Packet::MESSAGE_SIZE; i++)
         this->message[i] += rhs.message[i];
@@ -65,3 +72,5 @@ Packet& Packet::operator+(const Packet & rhs) {
 bool operator<(const Packet &lhs, const Packet &rhs) {
     return lhs.highPriority < rhs.highPriority;
 }
+
+// TODO: Add a byte in header info for field constant table id (using m for GF(2^m) for the id
