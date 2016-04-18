@@ -8,6 +8,7 @@
 
 #include "Node.hpp"
 #include "Queue.hpp"
+#include <string.h>
 #include <iostream>
 #include <fstream>
 #include <pthread.h>
@@ -22,7 +23,6 @@ private:
     std::ofstream out;
     Queue<std::string> queue;
 
-    // TODO: member to hold output buffer (queue) used by log thread
     std::vector<Node> nodes;
     unsigned int currentTick;
     std::vector<std::pair<unsigned int, Packet>> unaddedPackets; // Must be presorted
@@ -31,17 +31,13 @@ private:
     void runTick();
 
 public:
-    Simulator();
-    Simulator(signed int sleepTime);
-    Simulator(std::string logFilePath);
-    Simulator(signed int sleepTime, std::string logFilePath);
+    Simulator(std::vector<Node> & nodes, std::vector<std::pair<unsigned int, Packet>> packets);
     ~Simulator();
 
     void handler();
     void log(std::string logString);
     void log(std::vector<std::string> logVector);
 
-    Simulator(std::vector<Node> & nodes, std::vector<std::pair<unsigned int, Packet>> packets);
     void start(); // TODO: Eric
 
 

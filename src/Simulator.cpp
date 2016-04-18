@@ -5,36 +5,15 @@
 
 #include "Simulator.hpp"
 
-//create and write log.csv to Desktop
-Simulator::Simulator(){
+Simulator::Simulator(std::vector<Node> & nodes, std::vector<std::pair<unsigned int, Packet>> packets):
+nodes(nodes), unaddedPackets(packets){
+    //create file at location specified in .hpp
     std::string path(getenv("HOME"));
+    path += "/log.csv";
     out.open(path);
+
+    //start thread and store it
     simulatorThread = std::thread(&Simulator::handler, this);
-}
-
-//set thread sleep time
-//create and write log.csv to Desktop
-Simulator::Simulator(signed int sleepTime):
-Simulator(){
-    this->sleepTime = sleepTime;
-}
-
-//create and write log.csv to user defined path
-Simulator::Simulator(std::string logFilePath){
-    logFilePath += "log.csv";
-    out.open(logFilePath);
-
-    if( !out.is_open() )
-        std::cout << "Error creating/writing to specified path for Simulator" << std::endl;
-
-    simulatorThread = std::thread(&Simulator::handler, this);
-}
-
-//set thread sleep time
-//create and write log.csv to Desktop
-Simulator::Simulator(signed int sleepTime, std::string logFilePath):
-Simulator(logFilePath){
-    this->sleepTime = sleepTime;
 }
 
 Simulator::~Simulator(){
