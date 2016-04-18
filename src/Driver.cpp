@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <climits>
 
 #include "matrix.hpp"
 #include "Simulator.hpp"
@@ -48,6 +49,8 @@ int main(){
     Node B(2);
     Node C(3);
     Node D(4);
+    Node E(5);
+    Node F(6);
 
     std::vector<Node*> aNeighbors;
     aNeighbors.push_back((&B));
@@ -58,11 +61,14 @@ int main(){
     std::vector<Node*> bNeighbors;
     bNeighbors.push_back((&C));
     bNeighbors.push_back((&A));
+    bNeighbors.push_back((&F));
     B.setNeighbors(bNeighbors);
 
     std::vector<Node*> cNeighbors;
     cNeighbors.push_back((&A));
     cNeighbors.push_back((&D));
+    cNeighbors.push_back((&B));
+    cNeighbors.push_back((&E));
     C.setNeighbors(cNeighbors);
 
     std::vector<Node*> dNeighbors;
@@ -97,11 +103,11 @@ int main(){
         }
     }
 
+    //Dij
     for(int i=0;i<allNodes.size();i++)
         std::cout << allNodes.at(i)->getUniqueID() << std::endl;
 
-    //Dij
-
+    std::cout << "----------" << std::endl;
     //can I switch these two?
     std::unordered_map<Node*, unsigned int> routingTable;
 
@@ -111,9 +117,14 @@ int main(){
     //A = this
     //initialize to -1
     for(int i=0;i<allNodes.size();i++)
-        routingTable.insert({allNodes.at(i), -1});
+        routingTable.insert({allNodes.at(i), 4294967295});
 
     routingTable.at(&A) = 0; //A = this
+
+    for (auto& x: routingTable) {
+        std::cout << x.first->getUniqueID() << ": " << x.second << std::endl;
+    }
+    std::cout << "------------" << std::endl;
 
     //list of nodes whose least cost path is known
     std::vector<Node*> pathKnown;
@@ -125,24 +136,41 @@ int main(){
         //current node is adjacent to root (this)
         if( std::find(A.getNeighbors().begin(), A.getNeighbors().end(), v) != A.getNeighbors().end() )
             routingTable.at(v) = 1;
-        // = inf is -1
     }
 
     //loop until all least cost paths are known
     while( pathKnown.size() != allNodes.size() ){
-        //find a node not in pathKnown
-        //this is probably wrong, depending on what line 9 means
         Node* w;
+        unsigned int leastCost = 4294967295;
+
+        //find a node not in pathKnown with the minimum current cost
         for(int i=0;i<allNodes.size();i++){
-            if( std::find(pathKnown.begin(), pathKnown.end(), allNodes.at(i)) != pathKnown.end() ){
+            int curValue = routingTable.at( allNodes.at(i) );
+
+            if( (std::find(pathKnown.begin(), pathKnown.end(), allNodes.at(i)) == pathKnown.end()) && curValue < leastCost ){
                 w = allNodes.at(i);
-                break;
+                leastCost = curValue;
             }
         }
 
-        
+        //add w to N'
+        pathKnown.push_back(w);
 
+        //update D(v) for all v adjacent to w and not in pathKnown
+        for(int i=0;i<w->getNeighbors().size();i++){
+            Node* v = w->getNeighbors().at(i);
+
+            if( std::find(pathKnown.begin(), pathKnown.end(), v) == pathKnown.end() ){
+                routingTable.at(v) = std::min(routingTable.at(v), (routingTable.at(w) + 1));
+            }
+        }
     }
+
+    for (auto& x: routingTable) {
+        std::cout << x.first->getUniqueID() << ": " << x.second << std::endl;
+    }
+
+    //std::cout << "---------" << std::endl << INT_MAX << std::endl;
 
     return 0;
 }
