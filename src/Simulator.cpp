@@ -8,7 +8,6 @@
 //create and write log.csv to Desktop
 Simulator::Simulator(){
     std::string path(getenv("HOME"));
-    path += defaultPath;
     out.open(path);
     simulatorThread = std::thread(&Simulator::handler, this);
 }

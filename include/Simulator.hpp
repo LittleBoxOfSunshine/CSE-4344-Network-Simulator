@@ -19,7 +19,6 @@ class Simulator {
 private:
     std::thread simulatorThread;
     signed int sleepTime = 3;
-    std::string defaultPath = "/Desktop/log.csv";
     std::ofstream out;
     Queue<std::string> queue;
 
