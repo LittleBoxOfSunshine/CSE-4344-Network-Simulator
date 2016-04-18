@@ -16,9 +16,18 @@ void Node::sendPacket(const Packet & packet, const int &tick) {
 
 //written by Eric Smith
 void Node::buildRoutes() {
-    
+    //dij gives shortest from one node to every
+    //only concerened with first part from a to b
+    //know paths, easier to calculate
+    //dijstras has a sense of when it's over
+    //its recursive
 
 }
+
+void Node::buildTopology(){
+
+}
+
 
 // Needed to create vector<Node>
 Node::Node() { this->uniqueID = ++(Node::sequenceID); }
@@ -27,6 +36,14 @@ Node::Node(unsigned int uniqueID) : uniqueID{uniqueID} { }
 
 void Node::setNeighbors(std::vector<Node *> &neighbors) {
     this->neighbors = neighbors;
+}
+
+std::vector<Node*> & Node::getNeighbors(){
+    return this->neighbors;
+}
+
+unsigned int Node::getUniqueID(){
+    return this->uniqueID;
 }
 
 void Node::receivePacket(const Packet &packet, const int &tick) {
