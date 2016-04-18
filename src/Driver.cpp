@@ -19,11 +19,11 @@ int main( int argc, char * argv[] ) {
     // Check that required command line args were supplied
     if( argc == 3 ){
         // Load config
-        std::ifstream configFile(argv[2], ios::in);
+        std::ifstream configFile(argv[2], std::ios::in);
 
 
         // Load messages
-        std::ifstream messageFile(argv[1], ios::in);
+        std::ifstream messageFile(argv[1], std::ios::in);
 
 
         // Create random network

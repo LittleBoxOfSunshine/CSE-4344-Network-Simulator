@@ -33,8 +33,8 @@ private:
 
 public:
     Node();
-    Node(int uniqueID, std::vector<Node*> & neighbors);
-    void receivePacket(Packet & packet, const int & tick); // Called by neighbor nodes when they send a packet
+    Node(unsigned int uniqueID, std::vector<Node*> & neighbors);
+    void receivePacket(const Packet & packet, const int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p); // Called by simulator when a packet is "created" for the node to send
     void slotAction(const int & tick); // Called by simulator to run the node's actions during the current time slot (tick)
 };
