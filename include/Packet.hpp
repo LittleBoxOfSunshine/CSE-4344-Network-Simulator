@@ -6,6 +6,7 @@
 #define SIMULATOR_PACKET_HPP
 
 #include <cstdint>
+#include <vector>
 
 class Packet {
 private:
@@ -16,6 +17,9 @@ private:
     bool highPriority; // Signals message must be sent ASAP (true) or it can be delayed for linear combination (false)
 
 public:
+
+    /// Size of messages in bytes, padding will be added if message is short
+    const static unsigned char MESSAGE_SIZE = 127;
 
     Packet();
     Packet(int source, int destination, uint8_t* message, bool highPriority=false);
@@ -36,8 +40,13 @@ public:
     void setHighPriority();
     void setLowPriority();
 
-    Packet& operator*(const int & fieldConstant); // To multiply by Galois Field constant
-    Packet& operator+(const Packet & rhs); // To add to other packets during linear combinations
+    /// To multiply by Galois Field constant
+    Packet& operator*(const int & fieldConstant);
+
+    /// To add to other packets during linear combinations
+    Packet& operator+(const Packet & rhs);
+
+    //// To allow for use with std::priority_queue, compares using lhs.highPriority < rhs.highPriority
     friend bool operator<(const Packet & lhs, const Packet & rhs);
 };
 
