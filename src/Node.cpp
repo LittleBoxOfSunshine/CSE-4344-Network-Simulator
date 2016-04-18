@@ -3,6 +3,7 @@
 //
 #include <algorithm>
 #include <climits>
+#include <stack>
 
 #include "Node.hpp"
 #include "Simulator.hpp"
@@ -85,7 +86,7 @@ void Node::buildRoutes() {
                 Node* firstHop = std::get<2>(vTuple);
 
                 //set 1st hop if
-                if((wDist + 1) < vDist && firstHop == v){
+                if((wDist + 1) > vDist && firstHop == v){
                     firstHop = w;
                 }
 
@@ -112,26 +113,30 @@ void Node::buildRoutes() {
 
 //BFS to find all the nodes in the network
 void Node::buildTopology(){
-    Queue<Node*> frontier;
+
+    std::queue<Node*> frontier;
 
     //mark root visited
     allNodes.push_back(this);
     frontier.push(this);
 
-    while( !frontier.getQueue().empty() ){
-        Node* n = frontier.pop();
+    while( !frontier.empty() ){
+        for(auto &n : frontier.front()->getNeighbors() ){
 
-        for(int i=0;i<n->getNeighbors().size();i++){
-            Node* nPrime = n->getNeighbors().at(i);
-
+            std::cout << n->getUniqueID() << ": ";
+            for(auto x:n->getNeighbors())
+                std::cout << x->getUniqueID() << ", ";
+            std::cout << "-----------" << std::endl;
             //allNodes doesn't contain nPrime (nPrime hasn't been visited)
-            if(std::find(allNodes.begin(), allNodes.end(), nPrime) == allNodes.end()){
-                frontier.push(nPrime);
+            if(std::find(allNodes.begin(), allNodes.end(), n) == allNodes.end()){
+                frontier.push(n);
 
                 //mark nPrime visited
-                allNodes.push_back(nPrime);
+                allNodes.push_back(n);
             }
         }
+
+        frontier.pop();
     }
 
 }

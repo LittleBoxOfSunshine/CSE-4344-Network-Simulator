@@ -52,6 +52,8 @@ int main(){
     Node E(5);
     Node F(6);
     Node G(7);
+    Node H(8);
+    Node I(9);
 
     std::vector<Node*> aNeighbors;
     aNeighbors.push_back((&B));
@@ -80,18 +82,29 @@ int main(){
     std::vector<Node*> eNeighbors;
     eNeighbors.push_back((&C));
     eNeighbors.push_back((&G));
-    E.setNeighbors(dNeighbors);
+    E.setNeighbors(eNeighbors);
 
     std::vector<Node*> fNeighbors;
     fNeighbors.push_back((&B));
+    fNeighbors.push_back((&H));
     F.setNeighbors(fNeighbors);
 
     std::vector<Node*> gNeighbors;
     gNeighbors.push_back((&E));
+    gNeighbors.push_back((&I));
     G.setNeighbors(gNeighbors);
 
+    std::vector<Node*> hNeighbors;
+    hNeighbors.push_back((&F));
+    H.setNeighbors(hNeighbors);
+
+    std::vector<Node*> iNeighbors;
+    iNeighbors.push_back((&G));
+    I.setNeighbors(iNeighbors);
+
     A.buildRoutes();
-    A.printRoutingTable();
+    //A.printRoutingTable();
+
 
     return 0;
 }
