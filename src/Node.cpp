@@ -92,6 +92,7 @@ void Node::buildTopology(){
             }
         }
     }
+
 }
 
 
@@ -163,8 +164,11 @@ void Node::printRoutingTable(){
     std::cout << " ---- Routing Table ----" << std::endl;
     std::cout << "| Unique ID | Distance |" << std::endl;
     std::cout << "------------------------" << std::endl;
-    for (auto& x: routingTable) {$
-        std::cout << x.first->getUniqueID() << " | " << x.second << std::endl;
+    for(auto& x: routingTable){
+        if(x.first == this)
+            std::cout << "root" << " | " << x.second << std::endl;
+        else
+            std::cout << x.first->getUniqueID() << " | " << x.second << std::endl;
     }
     std::cout << "------------------------" << std::endl;
 }
