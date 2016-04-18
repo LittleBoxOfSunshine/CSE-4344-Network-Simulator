@@ -23,7 +23,7 @@ void Node::buildRoutes() {
 
     //initialize routingTable
     for(int i=0;i<allNodes.size();i++)
-        routingTable.insert({allNodes.at(i), 4294967295});
+        routingTable.insert({allNodes.at(i), ULONG_MAX});
 
     routingTable.at(this) = 0; //set this as root node
 
@@ -42,7 +42,7 @@ void Node::buildRoutes() {
     //loop until all least cost paths are known
     while( pathKnown.size() != allNodes.size() ){
         Node* w;
-        unsigned int leastCost = 4294967295;
+        unsigned int leastCost = ULONG_MAX;
 
         //find a node not in pathKnown with the minimum current cost
         for(int i=0;i<allNodes.size();i++){
