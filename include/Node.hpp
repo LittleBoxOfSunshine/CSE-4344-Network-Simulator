@@ -26,7 +26,7 @@ private:
     std::vector<Packet> packetCache;
     std::queue<Packet> inputBuffer;
     std::priority_queue<Packet> outputBuffer;
-    std::unordered_map<unsigned short, Node*> routingTable;
+    std::unordered_map<unsigned short, Node*> routingTable; //key: destination ID, value: first hop to destination
     bool receivedCTS;
     bool receivedRTS;
 
@@ -38,7 +38,7 @@ private:
     unsigned int lastTickActed; // Last tick that the node acted on, always updated by Node::slotAction()
 
     void sendPacket(const Packet & packet, const int &tick);
-    //void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
+    void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
     void buildTopology(); // fills allNodes to create topology of network
     void transmitterAction(); // NOTE: This must check RTS/CTS and should also apply collisions (CSMA/CA)
                                 // NOTE: will need some more member variables for this function
@@ -48,7 +48,6 @@ private:
     void emitCTS();
 
 public:
-    void buildRoutes();
     Node();
     Node(unsigned short uniqueID);
     void setNeighbors(std::vector<Node*> & neighbors);

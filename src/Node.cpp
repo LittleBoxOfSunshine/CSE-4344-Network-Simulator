@@ -23,11 +23,6 @@ void Node::sendPacket(const Packet & packet, const int &tick) {
 void Node::buildRoutes() {
     buildTopology();
 
-    std::cout << "allNodes:";
-    for(auto x:allNodes)
-        std::cout << x->getUniqueID() << ", ";
-    std::cout << std::endl;
-
     std::unordered_map<Node*, std::tuple<unsigned short, int, Node*> >initialRouting;
 
     //initialize routingTable
@@ -85,10 +80,10 @@ void Node::buildRoutes() {
 
                 Node* firstHop = std::get<2>(vTuple);
 
-                //set 1st hop if
+                //if this node is beyond depth 1, go back through nodes until firstHop is found
+                //firstHop is a neighbor of the root (this)
                 if( (wDist + 1) < vDist ){
-                    //std::cout << "FirstHop is " << firstHop->getUniqueID() << " replacing with " << w->getUniqueID() << std::endl;
-                    //std::cout << v->getUniqueID() << std::endl;
+
                     Node* targetFirstHop = w;
                     while( std::find(this->getNeighbors().begin(), this->getNeighbors().end(), targetFirstHop) == this->getNeighbors().end() ){
                         std::tuple<unsigned short, int, Node*> target = initialRouting.at(targetFirstHop);
@@ -103,17 +98,11 @@ void Node::buildRoutes() {
         }
     }
 
-    std::cout << "pathKnown:";
-    for(auto x:pathKnown)
-        std::cout << x->getUniqueID() << ", ";
-    std::cout << std::endl;
-
-    std::cout << "DestID | NumHops | FirstHopID" << std::endl;
+    //populate routingTable
     for(auto& x : initialRouting ){
         std::tuple<unsigned short, int, Node*> tempT = x.second;
-        int dist = std::get<1>(tempT);
-
-        std::cout << x.first->getUniqueID() << "\t\t\t" << dist << "\t\t\t" << std::get<2>(tempT)->getUniqueID() << std::endl;
+        //int dist = std::get<1>(tempT); //distance
+        routingTable.insert({x.first->getUniqueID(), std::get<2>(tempT)});
     }
 
 
@@ -211,16 +200,15 @@ Packet* Node::processorAction() {
 }
 
 void Node::printRoutingTable(){
-    /*
     std::cout << " ---- Routing Table ----" << std::endl;
-    std::cout << "| Unique ID | Distance |" << std::endl;
+    std::cout << "| Dest ID | First Hop |" << std::endl;
     std::cout << "------------------------" << std::endl;
     for(auto& x: routingTable){
-        if(x.first == this)
-            std::cout << "root" << " | " << x.second << std::endl;
+        if(x.first == this->getUniqueID())
+            std::cout << "  " << "root" << "\t|\t" << x.second->getUniqueID() << std::endl;
         else
-            std::cout << x.first->getUniqueID() << " | " << x.second << std::endl;
+            std::cout << "  " << x.first << "\t\t|\t" << x.second->getUniqueID() << std::endl;
     }
     std::cout << "------------------------" << std::endl;
-     */
+
 }
