@@ -12,30 +12,37 @@ class Packet {
 private:
 
     uint8_t* message; // Byte array containing the packet's message
-    int source; // Unique ID of the source
-    int destination; // Unique ID of the source
+    unsigned long source; // Unique ID of the source
+    unsigned long destination; // Unique ID of the source
     bool highPriority; // Signals message must be sent ASAP (true) or it can be delayed for linear combination (false)
+    unsigned short groupID;
 
 public:
 
     /// Size of messages in bytes, padding will be added if message is short
-    const static unsigned char MESSAGE_SIZE = 127;
+    const static uint8_t MESSAGE_SIZE = 102;
+
+    /// Size of 802.15.4 frame in bytes
+    const static uint8_t FRAME_SIZE = 127;
 
     Packet();
-    Packet(int source, int destination, uint8_t* message, bool highPriority=false);
+    Packet(unsigned long source, unsigned long destination, uint8_t* message, bool highPriority=false,
+           unsigned short groupID=0);
 
     uint8_t* getMessage();
-    int getSource();
-    int getDestination();
+    unsigned long getSource();
+    unsigned long getDestination();
     bool getPriority();
+    unsigned short getGroupID();
 
     bool isHighPriority();
     bool isLowPriority();
 
     void setMessage(uint8_t* message);
-    void setSource(int source);
-    void setDestination(int destination);
+    void setSource(unsigned long source);
+    void setDestination(unsigned long destination);
     void setPriority(bool priority);
+    void setGroupID(unsigned short groupID);
 
     void setHighPriority();
     void setLowPriority();

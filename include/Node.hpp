@@ -14,7 +14,11 @@
 class Node {
 private:
 
+    //const static unordered_map<> GROUP_TABLE;
+
+    static unsigned int sequenceID;
     unsigned int uniqueID;
+    unsigned short groupID;
     std::vector<Node*> neighbors;
     std::vector<Packet> packetCache;
     std::priority_queue<Packet> inputBuffer;
@@ -33,11 +37,13 @@ private:
 
 public:
     Node();
-    Node(unsigned int uniqueID, std::vector<Node*> & neighbors);
+    Node(unsigned int uniqueID);
+    void setNeighbors(std::vector<Node*> & neighbors);
     void receivePacket(const Packet & packet, const int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p); // Called by simulator when a packet is "created" for the node to send
     void slotAction(const int & tick); // Called by simulator to run the node's actions during the current time slot (tick)
 };
 
+unsigned int Node::sequenceID = 0;
 
 #endif //SIMULATOR_NODE_HPP
