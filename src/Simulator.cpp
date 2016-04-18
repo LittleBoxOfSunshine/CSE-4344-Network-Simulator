@@ -5,9 +5,11 @@
 
 #include "Simulator.hpp"
 
+std::queue<Packet> Simulator::transmittedPackets;
+
 Simulator::Simulator(std::vector<Node> & nodes, std::vector<std::pair<unsigned int, Packet>> packets):
 nodes(nodes), unaddedPackets(packets){
-    //create file at location specified in .hpp
+    //create file at location specified in home dir
     std::string path(getenv("HOME"));
     path += "/log.csv";
     out.open(path);
@@ -58,5 +60,5 @@ void Simulator::runTick() {
 
     // Have all nodes act
     for(auto &n : this->nodes)
-        n.slotAction(this->currentTick);
+        n.slotAction(this->currentTick, Simulator::transmittedPackets);
 }

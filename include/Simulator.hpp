@@ -28,10 +28,12 @@ private:
     std::vector<std::pair<unsigned int, Packet>> unaddedPackets; // Must be presorted
     int packetIndex;
 
-    void runTick();
+    void runTick(); // Packets that finish transmitting during this tick will be added to Simulator::transmittedPackets
 
 public:
     Simulator(std::vector<Node> & nodes, std::vector<std::pair<unsigned int, Packet>> packets);
+    static std::queue<Packet> transmittedPackets;
+
     ~Simulator();
 
     void handler();
