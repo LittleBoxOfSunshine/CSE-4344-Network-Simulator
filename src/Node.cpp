@@ -45,3 +45,29 @@ void Node::slotAction(const int &tick) {
     // while(this->inputBuffer.size() > this->queueCount) for packet processing
     // last steps will be => this->queueCount = 0; this->lastTickActed = tick;
 }
+
+void Node::emitRTS() {
+    for( auto &n : this->neighbors )
+        n->receiveRTS();
+}
+
+void Node::emitCTS() {
+    for( auto &n : this->neighbors )
+        n->receiveCTS();
+}
+
+void Node::receiveRTS() {
+    this->receivedRTS = true;
+}
+
+void Node::receiveCTS() {
+    this->receivedCTS = true;
+}
+
+void Node::transmitterAction() {
+
+}
+
+void Node::processerAction() {
+
+}

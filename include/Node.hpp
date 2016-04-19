@@ -21,9 +21,11 @@ private:
     unsigned short groupID;
     std::vector<Node*> neighbors;
     std::vector<Packet> packetCache;
-    std::priority_queue<Packet> inputBuffer;
+    std::queue<Packet> inputBuffer;
     std::priority_queue<Packet> outputBuffer;
     std::unordered_map<unsigned int, Node*> routingTable;
+    bool receivedCTS;
+    bool receivedRTS;
 
     unsigned int queueCount; // The number of packets that have been added to the queue during this tick
                              // This is needed to prevent receiving and processing a packet in the same tick
