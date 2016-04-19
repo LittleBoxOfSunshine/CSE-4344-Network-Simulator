@@ -9,6 +9,24 @@
 
 class Simulator {
 
+private:
+
+    // TODO: member to hold output buffer (queue) used by log thread
+    std::vector<Node> nodes;
+    unsigned int currentTick;
+    std::vector<std::pair<unsigned int, Packet>> unaddedPackets; // Must be presorted
+    int packetIndex;
+
+    void runTick();
+
+public:
+
+    Simulator(std::vector<Node> & nodes, std::vector<std::pair<unsigned int, Packet>> packets);
+    void start(); // TODO: Eric
+
+
+    // TODO: log function
+
 };
 
 

@@ -72,3 +72,5 @@ Packet& Packet::operator+(const Packet & rhs) {
 bool operator<(const Packet &lhs, const Packet &rhs) {
     return lhs.highPriority < rhs.highPriority;
 }
+
+// TODO: Add a byte in header info for field constant table id (using m for GF(2^m) for the id

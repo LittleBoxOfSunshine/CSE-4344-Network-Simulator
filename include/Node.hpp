@@ -34,6 +34,13 @@ private:
 
     void sendPacket(const Packet & packet, const int &tick);
     void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
+    void transmitterAction(); // NOTE: This must check RTS/CTS and should also apply collisions (CSMA/CA)
+                                // NOTE: will need some more member variables for this function
+    void processerAction(); // NOTE: at most 1 encode or decode per tick, this is also where routing happens
+                            // TODO: Emit signal when packet has arrived at intended destination
+    void emitRTS();
+    void emitCTS();
+
 
 public:
     Node();
@@ -42,6 +49,8 @@ public:
     void receivePacket(const Packet & packet, const int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p); // Called by simulator when a packet is "created" for the node to send
     void slotAction(const int & tick); // Called by simulator to run the node's actions during the current time slot (tick)
+    void receiveRTS();
+    void receiveCTS();
 };
 
 unsigned int Node::sequenceID = 0;
