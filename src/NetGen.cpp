@@ -31,7 +31,7 @@ std::vector<Node*>& gridGen(int numNodes, int numColumns) {
     std::vector<Node*> nodes(numNodes);
     for(int i=0;i<numNodes;i++){
         std::vector<Node*> neighbors;
-        if(i - numColumns > 0){
+        if(i - numColumns >= 0){
             neighbors.push_back(nodes[i-numColumns]);
         }
         if(i + numColumns < numNodes){
