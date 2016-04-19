@@ -55,6 +55,4 @@ public:
     void receiveCTS();
 };
 
-unsigned int Node::sequenceID = 0;
-
 #endif //SIMULATOR_NODE_HPP
