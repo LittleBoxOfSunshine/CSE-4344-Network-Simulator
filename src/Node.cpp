@@ -38,7 +38,7 @@ void Node::queuePacket(const Packet &p) {
     this->outputBuffer.push(p);
 }
 
-void Node::slotAction(const int &tick, std::vector<Packet> & transmittedPackets) {
+void Node::slotAction(const int &tick, std::queue<Packet> & transmittedPackets) {
     // TODO: Implement this function
 
     this->transmitterAction();

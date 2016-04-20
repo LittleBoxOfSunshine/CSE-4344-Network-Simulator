@@ -51,7 +51,7 @@ public:
     void setNeighbors(std::vector<Node*> & neighbors);
     void receivePacket(const Packet & packet, const int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p); // Called by simulator when a packet is "created" for the node to send
-    void slotAction(const int & tick, std::vector<Packet> & transmittedPackets);
+    void slotAction(const int & tick, std::queue<Packet> & transmittedPackets);
                     // Called by simulator to run the node's actions during the current time slot (tick)
     void receiveRTS();
     void receiveCTS();

@@ -27,11 +27,12 @@ private:
     unsigned int currentTick;
     std::vector<std::pair<unsigned int, Packet>> unaddedPackets; // Must be presorted
     int packetIndex;
-    static std::vector<Packet> transmittedPackets;
 
     void runTick(); // Packets that finish transmitting during this tick will be added to Simulator::transmittedPackets
 
 public:
+    static std::queue<Packet> transmittedPackets;
+
     Simulator();
     Simulator(signed int sleepTime);
     Simulator(std::string logFilePath);
