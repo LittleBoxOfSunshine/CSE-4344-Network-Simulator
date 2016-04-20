@@ -5,6 +5,8 @@
 
 #include "Simulator.hpp"
 
+std::queue<Packet> Simulator::transmittedPackets;
+
 //create and write log.csv to Desktop
 Simulator::Simulator(){
     std::string path(getenv("HOME"));
