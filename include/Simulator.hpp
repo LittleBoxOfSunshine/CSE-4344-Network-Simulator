@@ -16,8 +16,9 @@ private:
     unsigned int currentTick;
     std::vector<std::pair<unsigned int, Packet>> unaddedPackets; // Must be presorted
     int packetIndex;
+    static std::vector<Packet> transmittedPackets;
 
-    void runTick();
+    void runTick(); // Packets that finish transmitting during this tick will be added to Simulator::transmittedPackets
 
 public:
 

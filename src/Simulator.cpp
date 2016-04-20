@@ -14,5 +14,5 @@ void Simulator::runTick() {
 
     // Have all nodes act
     for(auto &n : this->nodes)
-        n.slotAction(this->currentTick);
+        n.slotAction(this->currentTick, Simulator::transmittedPackets);
 }
