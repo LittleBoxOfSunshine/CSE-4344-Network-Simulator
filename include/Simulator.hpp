@@ -18,6 +18,7 @@
 
 class Simulator {
 private:
+    static bool simulating;
     std::thread simulatorThread;
     signed int sleepTime = 3;
     std::ofstream out;
