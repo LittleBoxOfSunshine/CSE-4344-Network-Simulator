@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <iterator>
 #include <sstream>
+#include <array>
 
 class Simulator {
 private:
@@ -24,7 +25,8 @@ private:
     std::ofstream out;
     Queue<std::string> queue;
 
-    std::vector<Node> nodes;
+    Node* nodes;
+    int nodeCount;
     unsigned int currentTick;
     std::vector<std::pair<unsigned int, Packet>> unaddedPackets; // Must be presorted
     int packetIndex;
@@ -32,7 +34,7 @@ private:
     void runTick(); // Packets that finish transmitting during this tick will be added to Simulator::transmittedPackets
 
 public:
-    Simulator(std::vector<Node> & nodes, std::vector<std::pair<unsigned int, Packet>> packets);
+    Simulator(Node* nodes, int nodeCount, std::vector<std::pair<unsigned int, Packet>> packets);
     static std::queue<Packet> transmittedPackets;
 
     ~Simulator();

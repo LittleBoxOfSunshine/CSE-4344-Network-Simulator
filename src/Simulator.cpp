@@ -8,8 +8,11 @@
 std::queue<Packet> Simulator::transmittedPackets;
 bool Simulator::simulating = true;
 
-Simulator::Simulator(std::vector<Node> & nodes, std::vector<std::pair<unsigned int, Packet>> packets):
-nodes(nodes), unaddedPackets(packets){
+Simulator::Simulator(Node* nodes, int nodeCount, std::vector<std::pair<unsigned int, Packet>> packets)
+        : nodes{nodes}
+        , nodeCount{nodeCount}
+        , unaddedPackets{packets}
+{
     //create file at location specified in home dir
     std::string path(getenv("HOME"));
     path += "/log.csv";
@@ -65,4 +68,12 @@ void Simulator::runTick() {
     // Have all nodes act
     for(auto &n : this->nodes)
         n.slotAction(this->currentTick, Simulator::transmittedPackets);
+}
+
+void Simulator::start() {
+    // Build routing tables on all nodes
+    for(auto &n : this->nodes)
+        n.buildRoutes();
+
+    // TODO: Eric
 }

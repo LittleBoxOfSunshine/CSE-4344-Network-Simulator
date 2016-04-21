@@ -13,9 +13,11 @@ private:
 
     uint8_t* message; // Byte array containing the packet's message
     unsigned long source; // Unique ID of the source
-    unsigned long destination; // Unique ID of the source
+    unsigned long destination; // Unique ID of the destination
+    unsigned long lastHopID = 0; // Unique ID of the device that sent
     bool highPriority; // Signals message must be sent ASAP (true) or it can be delayed for linear combination (false)
     unsigned short groupID;
+    unsigned int gfmval = 0;
 
 public:
 
@@ -34,6 +36,8 @@ public:
     unsigned long getDestination();
     bool getPriority();
     unsigned short getGroupID();
+    unsigned int getGfmval();
+    unsigned int getLastHopID();
 
     bool isHighPriority();
     bool isLowPriority();
@@ -43,6 +47,8 @@ public:
     void setDestination(unsigned long destination);
     void setPriority(bool priority);
     void setGroupID(unsigned short groupID);
+    void setGfmval(unsigned int gfmval);
+    void setLastHopID(unsigned int lastHopID);
 
     void setHighPriority();
     void setLowPriority();

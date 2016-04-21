@@ -17,7 +17,7 @@ Packet::Packet(unsigned long source, unsigned long destination, uint8_t* message
         , destination{destination}
         , message{message}
         , highPriority{highPriority}
-        , groupID{0}
+        , groupID{groupID}
     {}
 
 uint8_t* Packet::getMessage() { return this->message; }
@@ -29,6 +29,10 @@ unsigned long Packet::getDestination() { return this->destination; }
 bool Packet::getPriority() { return this->highPriority; }
 
 unsigned short Packet::getGroupID() { return this->groupID; }
+
+//unsigned int Packet::getGfmval() { return this->gfmval; }
+
+unsigned
 
 bool Packet::isHighPriority() { return this->highPriority; }
 
@@ -48,6 +52,9 @@ void Packet::setLowPriority() { this->highPriority = false; }
 
 void Packet::setGroupID(unsigned short groupID) { this->groupID = groupID; }
 
+void Packet::setGfmval(unsigned int gfmval) { this->gfmval = gfmval; }
+
+/*
 Packet& Packet::operator*(const int &fieldConstant) {
     this->source *= fieldConstant;
 
@@ -72,5 +79,6 @@ Packet& Packet::operator+(const Packet & rhs) {
 bool operator<(const Packet &lhs, const Packet &rhs) {
     return lhs.highPriority < rhs.highPriority;
 }
+*/
 
 // TODO: Add a byte in header info for field constant table id (using m for GF(2^m) for the id
