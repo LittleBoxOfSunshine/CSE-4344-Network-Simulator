@@ -9,11 +9,11 @@
 #include "Simulator.hpp"
 
 // Prototypes for network initialization
-void starGen(int numNodes, std::vector<Node> & nodes);
-void gridGen(int numNodes, std::vector<Node> & nodes);
+std::vector<Node*> starGen(int numNodes, std::vector<Node> & nodes);
+std::vector<Node*> gridGen(int numNodes, std::vector<Node> & nodes);
 void meshGen(int numNodes, std::vector<Node> & nodes);
 Matrix getGaloisField(int m); // Returns GF(2^m) //if a field is calculated, don’t re-calculate
-
+/*
 int main( int argc, char * argv[] ) {
 
     // Check that required command line args were supplied
@@ -25,11 +25,11 @@ int main( int argc, char * argv[] ) {
         // Load messages
         std::ifstream messageFile(argv[1], std::ios::in);
 
-
         // Create random network
 
         // Create & start simulator
-
+        //Simulator exampleSimulator;
+        //exampleSimulator.log("testdata1,testdata2");
         return 0;
     }
     // Invalid command line arguments, alert user and halt program
@@ -39,3 +39,9 @@ int main( int argc, char * argv[] ) {
     }
 }
 
+*/
+
+int main(){
+
+    return 0;
+}

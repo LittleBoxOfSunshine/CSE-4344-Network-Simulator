@@ -11,28 +11,28 @@
 
 
 /// Generate a random network with n nodes arranged in the star topology
-void starGen(int numNodes) {
-    std::vector<Node> nodes(numNodes);
-    Node center = Node(0);
-    std::vector<Node> leaves(numNodes-1);
+std::vector<Node*> starGen(int numNodes) {
+    std::vector<Node*> nodes(numNodes);
+    Node* center = nodes[0];
     nodes.push_back(center);
     for(int i=1;i<numNodes;i++) {
-        Node leaf = Node(i);
-        std::vector<Node> leafNeighbor;
+        Node* leaf = nodes[i];
+        std::vector<Node*> leafNeighbor;
         leafNeighbor.push_back(center);
-        leaf.setNeighbors(leafNeighbor);
-        leaves.push_back(leaf);
+        leaf->setNeighbors(leafNeighbor);
         nodes.push_back(leaf);
     }
-    center.setNeighbors(leaves);
+    std::vector<Node*> leaves(nodes.begin()+1,nodes.end());
+    center->setNeighbors(leaves);
+    return nodes;
 }
 
 /// Generate a random network with n nodes arranged in the grid topology
-void gridGen(int numNodes, int numColumns) {
-    std::vector<Node> nodes(numNodes);
+std::vector<Node*> gridGen(int numNodes, int numColumns) {
+    std::vector<Node*> nodes(numNodes);
     for(int i=0;i<numNodes;i++){
-        std::vector<Node> neighbors;
-        if(i - numColumns > 0){
+        std::vector<Node*> neighbors;
+        if(i - numColumns >= 0){
             neighbors.push_back(nodes[i-numColumns]);
         }
         if(i + numColumns < numNodes){
@@ -41,11 +41,12 @@ void gridGen(int numNodes, int numColumns) {
         if(i%numColumns!=0){
             neighbors.push_back(nodes[i-1]);
         }
-        if((i+1)%numColumns!=0){
+        if((i+1)%numColumns!=0 && i+1 < numNodes){
             neighbors.push_back(nodes[i+1]);
         }
-        nodes[i].setNeighbors(neighbors);
+        nodes[i]->setNeighbors(neighbors);
     }
+    return nodes;
 }
 
 /// Generate a random network with n nodes arranged in the mesh topology
