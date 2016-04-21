@@ -53,7 +53,7 @@ void meshGen(int numNodes, std::vector<Node> & nodes) {
     nodes.reserve(numNodes);
     std::vector<std::tuple<int, int>> edges;
     for(int i = 0; i < nodes.size(); i++) {     //create nodes with messages and tick times
-        nodes.at(i) = Node(0, )//TODO: add with message gen and tick time
+        nodes.at(i) = Node(0, );//TODO: add with message gen and tick time
     }
 
     for(int i = 0; i < edges.size(); i++) {        //create all edges based on read file
