@@ -15,6 +15,7 @@
 #include "Packet.hpp"
 
 class Simualtor;
+struct PacketComparison;
 
 class Node {
 private:
@@ -27,7 +28,7 @@ private:
     std::set<Node*> neighbors;
     //std::vector<Packet> packetCache; Would be used for opportunistic opportunities
     std::queue<Packet> inputBuffer;
-    std::priority_queue<Packet> outputBuffer;
+    std::priority_queue<Packet, std::vector<Packet>, PacketComparison> outputBuffer;
     std::unordered_map<unsigned int, Node*> routingTable;
     Packet readyToSend;
     bool readyToSendPacketExists = false;

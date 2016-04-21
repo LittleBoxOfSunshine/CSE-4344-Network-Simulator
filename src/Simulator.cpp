@@ -72,8 +72,8 @@ void Simulator::runTick() {
 
 void Simulator::start() {
     // Build routing tables on all nodes
-    for(auto &n : this->nodes)
-        n.buildRoutes();
+    for(int i = 0; i < this->nodeCount; i++)
+        this->nodes[i].buildRoutes();
 
     // TODO: Eric
 }

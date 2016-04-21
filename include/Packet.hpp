@@ -7,60 +7,39 @@
 
 #include <cstdint>
 #include <vector>
+#include <set>
 
 class Packet {
 private:
 
-    uint8_t* message; // Byte array containing the packet's message
+    unsigned int uniqueID;
     unsigned long source; // Unique ID of the source
-    unsigned long destination; // Unique ID of the destination
-    unsigned long lastHopID = 0; // Unique ID of the device that sent
+    std::set<unsigned long> destination; // Unique ID of the destination
     bool highPriority; // Signals message must be sent ASAP (true) or it can be delayed for linear combination (false)
-    unsigned short groupID;
-    unsigned int gfmval = 0;
 
 public:
 
-    /// Size of messages in bytes, padding will be added if message is short
-    const static uint8_t MESSAGE_SIZE = 102;
-
-    /// Size of 802.15.4 frame in bytes
-    const static uint8_t FRAME_SIZE = 127;
-
     Packet();
-    Packet(unsigned long source, unsigned long destination, uint8_t* message, bool highPriority=false,
-           unsigned short groupID=0);
+    Packet(unsigned int uniqueID, unsigned long source, unsigned long destination, bool highPriority=false);
 
-    uint8_t* getMessage();
+    unsigned int getUniqueID();
     unsigned long getSource();
-    unsigned long getDestination();
-    bool getPriority();
-    unsigned short getGroupID();
-    unsigned int getGfmval();
-    unsigned int getLastHopID();
+    std::set<unsigned long> getDestination();
+    bool getPriority() const;
 
     bool isHighPriority();
     bool isLowPriority();
 
-    void setMessage(uint8_t* message);
+    void setUniqueID(unsigned int uniqueID);
     void setSource(unsigned long source);
-    void setDestination(unsigned long destination);
+    void setDestination(std::set<unsigned long> destination);
     void setPriority(bool priority);
-    void setGroupID(unsigned short groupID);
-    void setGfmval(unsigned int gfmval);
-    void setLastHopID(unsigned int lastHopID);
 
     void setHighPriority();
     void setLowPriority();
 
-    /// To multiply by Galois Field constant
-    Packet& operator*(const int & fieldConstant);
-
-    /// To add to other packets during linear combinations
-    Packet& operator+(const Packet & rhs);
-
-    //// To allow for use with std::priority_queue, compares using lhs.highPriority < rhs.highPriority
-    friend bool operator<(const Packet & lhs, const Packet & rhs);
+    bool operator<(const Packet &rhs);
+    bool Packet::operator==(const Packet &rhs);
 };
 
 
