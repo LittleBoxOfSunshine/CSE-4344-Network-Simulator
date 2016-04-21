@@ -7,8 +7,6 @@
 unsigned int Node::sequenceID = 1;
 
 void Node::sendPacket(const Packet & packet, const int &tick) {
-    // TODO: Implement this function
-    // TODO: Implement some kind of MAC, probably CSMA/CA (to avoid collisions)
     // Due to broadcast nature of wireless, all neighbors receive the packet
     for( auto &n : this->neighbors)
         n->receivePacket(packet, tick);
@@ -39,6 +37,7 @@ void Node::queuePacket(const Packet &p) {
 }
 
 void Node::slotAction(const int &tick, std::queue<Packet> & transmittedPackets) {
+    // TODO: This should ensure that collisions are handled properly
     // TODO: Implement this function
 
     this->transmitterAction();
@@ -67,9 +66,14 @@ void Node::receiveCTS() {
 }
 
 void Node::transmitterAction() {
+    // Determine if temp packet received and if should be added
+        // should not be added if rts or cts receive or if multiple received
 
+    // TODO: Implement this function
+    // TODO: Implement some kind of MAC, probably CSMA/CA (to avoid collisions)
 }
 
 Packet* Node::processorAction() {
     // Can Decode 1 packet, or encode 1 packet
+
 }

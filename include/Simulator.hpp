@@ -43,7 +43,6 @@ public:
 
     void start(); // TODO: Eric
 
-
 };
 
 
