@@ -18,8 +18,9 @@
 
 class Simulator {
 private:
+    static bool simulating;
     std::thread simulatorThread;
-    signed int sleepTime = 3;
+    unsigned int sleepTime = 3;
     std::ofstream out;
     Queue<std::string> queue;
 
@@ -39,8 +40,6 @@ public:
     void handler();
     void log(std::string logString);
     void log(std::vector<std::string> logVector);
-
-    void start(); // TODO: Eric
 
 
 };
