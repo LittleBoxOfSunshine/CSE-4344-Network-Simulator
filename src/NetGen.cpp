@@ -12,7 +12,7 @@
 
 /// Generate a random network with n nodes arranged in the star topology
 std::vector<Node*> starGen(int numNodes) {
-    std::vector<Node*> nodes(numNodes);
+    std::vector<Node*> nodes(numNodes,new Node());
     Node* center = nodes[0];
     nodes.push_back(center);
     for(int i=1;i<numNodes;i++) {
@@ -29,7 +29,7 @@ std::vector<Node*> starGen(int numNodes) {
 
 /// Generate a random network with n nodes arranged in the grid topology
 std::vector<Node*> gridGen(int numNodes, int numColumns) {
-    std::vector<Node*> nodes(numNodes);
+    std::vector<Node*> nodes(numNodes,new Node());
     for(int i=0;i<numNodes;i++){
         std::vector<Node*> neighbors;
         if(i - numColumns >= 0){
