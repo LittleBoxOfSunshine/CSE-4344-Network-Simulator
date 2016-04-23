@@ -13,6 +13,10 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<std::pair<unsigned 
         , nodeCount{nodeCount}
         , unaddedPackets{packets}
 {
+    int numPackets=packets.size();
+    for(int i = 0;i<numPackets;i++) {
+        this->numDestinations+=packets[i].second.getDestination().size();
+    }
     //create file at location specified in home dir
     std::string path(getenv("HOME"));
     path += "/log.csv";
@@ -72,8 +76,16 @@ void Simulator::runTick() {
 
 void Simulator::start() {
     // Build routing tables on all nodes
-    for(int i = 0; i < this->nodeCount; i++)
+    for (int i = 0; i < this->nodeCount; i++)
         this->nodes[i].buildRoutes();
 
-    // TODO: Eric
+    while (this->numDestinations > 0){
+        this->runTick();
+        while(Packet transmitted = transmittedPackets.pop()){
+            numDestinations--;
+            std::string packetMessage = "Packet #" + std::to_string(transmitted.getUniqueID()) + " has reached a destination.";
+            this->log(packetMessage);
+        }
+    }
+    this->simulating=false;
 }

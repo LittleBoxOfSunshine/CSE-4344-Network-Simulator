@@ -82,7 +82,8 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
 
     Packet temp;
     while( this->inputBuffer.size() - this->queueCount > 0 ) {
-        Packet temp = this->inputBuffer.pop();
+        Packet temp = this->inputBuffer.front();
+        this->inputBuffer.pop();
 
         if(temp.findAndRemove(this->uniqueID))
             transmittedPackets.push(temp);

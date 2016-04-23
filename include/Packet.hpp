@@ -43,7 +43,7 @@ public:
     void setLowPriority();
 
     bool operator<(const Packet &rhs);
-    bool Packet::operator==(const Packet &rhs);
+    bool operator==(const Packet &rhs);
 
     bool findAndRemove(unsigned short destination); // true or false if found. if found then removes
 };
