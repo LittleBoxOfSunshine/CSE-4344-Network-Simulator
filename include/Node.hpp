@@ -48,11 +48,8 @@ private:
     unsigned int lastTickActed; // Last tick that the node acted on, always updated by Node::slotAction()
 
     void sendPacket(const Packet & packet, const unsigned int &tick);
-    void transmitterAction(); // NOTE: This must check RTS/CTS and should also apply collisions (CSMA/CA)
-                                // NOTE: will need some more member variables for this function
-
     void emitCTS(unsigned short sourceID, unsigned short destinationID, const unsigned int & tick);
-    void emitRTS(unsigned short sourceID, unsigned short destinationID);
+    void emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID);
 
 public:
     Node();
@@ -62,7 +59,7 @@ public:
     void queuePacket(const Packet & p); // Called by simulator when a packet is "created" for the node to send
     void slotAction(const unsigned int & tick, std::queue<Packet> & transmittedPackets);
                     // Called by simulator to run the node's actions during the current time slot (tick)
-    void receiveRTS(unsigned short sourceID, unsigned short destinationID);
+    void receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID);
     void receiveCTS(unsigned short rstSourceID, unsigned short rstDestinationID, const unsigned int & tick);
     void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
 };
