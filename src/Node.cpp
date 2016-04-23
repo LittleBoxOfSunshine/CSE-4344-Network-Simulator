@@ -160,7 +160,8 @@ void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinat
             }
             else {
                 backoffCounter = rand() % 2u << expCounter;
-                expCounter++;
+                if(expCounter < 10)
+                    expCounter++;
             }
         }
     }
