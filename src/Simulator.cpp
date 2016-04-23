@@ -63,8 +63,8 @@ void Simulator::log(std::vector<std::string> logVector){
 
 void Simulator::runTick() {
     // Queue packets in nodes to simulate them being "created" for the node to send when it can
-    while(this->unaddedPackets[this->packetIndex].first <= this->currentTick) {
-        this->nodes[this->unaddedPackets[this->packetIndex].second.getSource()-1]
+    while(this->unaddedPackets[this->packetIndex].getTick() <= this->currentTick) {
+        this->nodes[this->unaddedPackets[this->packetIndex].getSource()-1]
                 .queuePacket(this->unaddedPackets[this->packetIndex].second);
         packetIndex++;
     }
