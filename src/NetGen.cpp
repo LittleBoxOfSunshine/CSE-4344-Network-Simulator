@@ -68,7 +68,3 @@ void meshGen(int numNodes, std::vector<std::vector<std::string>>& neighborList) 
 
 }
 
-/// Generates the Galois Field GF(2^m) in a Matrix object
-Matrix getGaloisField(int m) { // Returns GF(2^m) //if a field is calculated, don’t re-calculate
-
-}
