@@ -1,8 +1,11 @@
 //
 // Created by cahenk on 4/17/16.
 //
+#include <algorithm>
+#include <climits>
 
 #include "Node.hpp"
+#include "Simulator.hpp"
 
 unsigned int Node::sequenceID = 1;
 
@@ -29,12 +32,8 @@ void Node::sendPacket(const Packet & packet, const unsigned int &tick) {
     }
 }
 
-void Node::buildRoutes() {
-
-}
-
 // Needed to create array of <Node> , 0 is reserved to single blank node
-Node::Node() { ++(Node::sequenceID); }
+Node::Node() { this->uniqueID = ++(Node::sequenceID); }
 
 Node::Node(unsigned short uniqueID)
         : uniqueID{uniqueID}
@@ -44,21 +43,15 @@ void Node::setNeighbors(std::set<Node *> &neighbors) {
     this->neighbors = neighbors;
 }
 
-// Note: hopDestID is the MAC ID the message was intended to be sent to
 void Node::receivePacket(const Packet &packet, const unsigned int &tick) {
-    if(packet.isHighPriority()) {
-        if( this->queueDelayTick < 0 || this->queueDelayTick > tick)
+    if (packet.isHighPriority()) {
+        if (this->queueDelayTick < 0 || this->queueDelayTick > tick)
             this->queueDelayTick = tick;
     }
-    else{
-        if( this->queueDelayTick < 0 || this->queueDelayTick > tick + Node::MAX_DELAY_FOR_LOW_PRIORITY)
+    else {
+        if (this->queueDelayTick < 0 || this->queueDelayTick > tick + Node::MAX_DELAY_FOR_LOW_PRIORITY)
             this->queueDelayTick = tick + Node::MAX_DELAY_FOR_LOW_PRIORITY;
     }
-
-    this->inputBuffer.push(packet);
-
-    if(this->lastTickActed < tick)
-        this->queueCount++;
 }
 
 void Node::queuePacket(const Packet &p, const unsigned int & tick) {
@@ -82,7 +75,7 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
 
     Packet temp;
     while( this->inputBuffer.size() - this->queueCount > 0 ) {
-        Packet temp = this->inputBuffer.front();
+        temp = this->inputBuffer.front();
         this->inputBuffer.pop();
 
         if(temp.findAndRemove(this->uniqueID))
@@ -94,6 +87,10 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
 
     ////////////////// SEND + SCHEDULE //////////////////
 
+    if( this->sourceIDCTS != 0 ) {
+        this->emitCTS(this->uniqueID, tick);
+        this->sourceIDCTS = 0;
+    }
     if( this->canSend ){
         while(this->outputBuffer.size() - this->outQueueCount > 0) {
             this->sendPacket(this->outputBuffer.front(), tick);
@@ -106,19 +103,19 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
     }
     else if( this->backoffCounter == 0 ){
         if( this->queueDelayTick < 0 && this->queueDelayTick < tick ) {
-            std::set<unsigned short> temp;
+            std::set<unsigned short> tempset;
 
             // Union all recipients of the buffer
             for( auto itr = this->outputBuffer.begin(); itr + this->outQueueCount < this->outputBuffer.end(); itr++)
                 std::set_union(
-                        temp.begin(),
-                        temp.end(),
+                        tempset.begin(),
+                        tempset.end(),
                         (*itr).getDestination().begin(),
                         (*itr).getDestination().end(),
-                        temp.begin()
+                        tempset.begin()
                 );
 
-            this->emitRTS(this->uniqueID, temp);
+            this->emitRTS(this->uniqueID, tempset);
         }
     }
     else{
@@ -128,22 +125,22 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
     this->lastTickActed = tick;
 }
 
-void Node::emitCTS(unsigned short sourceID, unsigned short destinationID, const unsigned int &tick) {
+void Node::emitCTS(unsigned short sourceID, const unsigned int &tick) {
     //call receive cts on all neighbors
-    for(auto &i : neighbors) {
-        receiveCTS(sourceID, destinationID, tick);
+    for(auto &n : neighbors) {
+        n->receiveCTS(sourceID, tick);
     }
 }
 
 void Node::emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID) {
     //call receive rts on all neighbors
-    for(auto &i : neighbors) {
-        receiveRTS(sourceID, destinationID);
+    for(auto &n : neighbors) {
+        n->receiveRTS(sourceID, destinationID);
     }
 }
 
-void Node::receiveCTS(unsigned short rstSourceID, unsigned short rstDestinationID, const unsigned int &tick) {
-    if(sourceIDCTS == uniqueID) {
+void Node::receiveCTS(unsigned short rstSourceID, const unsigned int &tick) {
+    if(rstSourceID == uniqueID) {
         canSend = true;
         lastSuccessfulRTSTick = tick -1;
     }
@@ -169,4 +166,92 @@ void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinat
         collision = true;
         sourceIDRTS = 0;
     }
+}
+
+//written by Eric Smith
+void Node::buildRoutes() {
+    std::vector<Node*> allNodes = buildTopology();
+
+    //initialize routingTable
+    for(int i=0;i<allNodes.size();i++)
+        routingTable.insert({allNodes.at(i), ULONG_MAX});
+
+    routingTable.at(this) = 0; //set this as root node
+
+    std::vector<Node*> pathKnown; //list of nodes whose least cost path is known
+    pathKnown.push_back(this);
+
+    //for all nodes adjacent to root (this), set their distances to 1
+    for(int i=0;i<allNodes.size();i++){
+        Node* v = allNodes.at(i);
+
+        //current node is adjacent to root (this)
+        if( std::find(this->neighbors.begin(), this->neighbors.end(), v) != this->neighbors.end() )
+            routingTable.at(v) = 1;
+    }
+
+    //loop until all least cost paths are known
+    while( pathKnown.size() != allNodes.size() ){
+        Node* w;
+        unsigned int leastCost = ULONG_MAX;
+
+        //find a node not in pathKnown with the minimum current cost
+        for(int i=0;i<allNodes.size();i++){
+            int curValue = routingTable.at( allNodes.at(i) );
+
+            if( (std::find(pathKnown.begin(), pathKnown.end(), allNodes.at(i)) == pathKnown.end()) && curValue < leastCost ){
+                w = allNodes.at(i);
+                leastCost = curValue;
+            }
+        }
+
+        //add w to list of known shortest paths
+        pathKnown.push_back(w);
+
+        //update cost of path for all v adjacent to w and not in pathKnown
+        for(auto itr = w->neighbors.begin(); itr != w->neighbors.end(); itr++){
+            if( std::find(pathKnown.begin(), pathKnown.end(), *itr) == pathKnown.end() ){
+                routingTable.at(*itr) = std::min(routingTable.at(*itr), (routingTable.at(w) + 1));
+            }
+        }
+    }
+
+}
+
+//BFS to find all the nodes in the network
+std::vector<Node*>& Node::buildTopology(){
+    Queue<Node*> frontier;
+
+    std::vector<Node*> allNodes;
+
+    //mark root visited
+    allNodes.push_back(this);
+    frontier.push(this);
+
+    while( !frontier.getQueue().empty() ){
+        Node* n = frontier.pop();
+
+        for(auto itr = n->neighbors.begin(); itr != n->neighbors.end(); itr++){
+            //allNodes doesn't contain nPrime (nPrime hasn't been visited)
+            if(std::find(allNodes.begin(), allNodes.end(), *itr) == allNodes.end()){
+                frontier.push(*itr);
+
+                //mark nPrime visited
+                allNodes.push_back(*itr);
+            }
+        }
+    }
+}
+
+void Node::printRoutingTable(){
+    std::cout << " ---- Routing Table ----" << std::endl;
+    std::cout << "| Unique ID | Distance |" << std::endl;
+    std::cout << "------------------------" << std::endl;
+    for(auto& x: routingTable){
+        if(x.first == this)
+            std::cout << "root" << " | " << x.second << std::endl;
+        else
+            std::cout << x.first->getUniqueID() << " | " << x.second << std::endl;
+    }
+    std::cout << "------------------------" << std::endl;
 }

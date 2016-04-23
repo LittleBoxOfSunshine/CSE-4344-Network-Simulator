@@ -34,7 +34,7 @@ private:
     unsigned int lastSuccessfulRTSTick;
     int queueDelayTick = 0;
 
-    static unsigned int sequenceID;
+    static unsigned short sequenceID;
     unsigned short uniqueID;
     std::set<Node*> neighbors;
     std::queue<Packet> inputBuffer;
@@ -49,8 +49,10 @@ private:
     unsigned int lastTickActed; // Last tick that the node acted on, always updated by Node::slotAction()
 
     void sendPacket(const Packet & packet, const unsigned int &tick);
-    void emitCTS(unsigned short sourceID, unsigned short destinationID, const unsigned int & tick);
+    void emitCTS(unsigned short sourceID, const unsigned int & tick);
     void emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID);
+    void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
+    std::vector<Node*>& buildTopology(); // fills allNodes to create topology of network
 
 public:
     Node();
@@ -61,8 +63,7 @@ public:
     void slotAction(const unsigned int & tick, std::queue<Packet> & transmittedPackets);
                     // Called by simulator to run the node's actions during the current time slot (tick)
     void receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID);
-    void receiveCTS(unsigned short rstSourceID, unsigned short rstDestinationID, const unsigned int & tick);
-    void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
+    void receiveCTS(unsigned short rstSourceID, const unsigned int & tick);
 };
 
 #endif //SIMULATOR_NODE_HPP

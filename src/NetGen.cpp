@@ -4,56 +4,66 @@
 
 /// This file contains code for random network / topology generation
 
+#include <set>
+#include <string>
 #include <vector>
+#include <iostream>
 
 #include "matrix.hpp"
 #include "Node.hpp"
 
+
 /// Generate a random network with n nodes arranged in the star topology
-std::vector<Node*> starGen(int numNodes) {
-    std::vector<Node*> nodes(numNodes);
-    Node* center = nodes[0];
-    nodes.push_back(center);
+Node* starGen(int numNodes) {
+    Node* nodes = new Node[numNodes];
+    Node center = nodes[0];
     for(int i=1;i<numNodes;i++) {
-        Node* leaf = nodes[i];
-        std::vector<Node*> leafNeighbor;
-        leafNeighbor.push_back(center);
-        leaf->setNeighbors(leafNeighbor);
-        nodes.push_back(leaf);
+        Node leaf = nodes[i];
+        std::set<Node> leafNeighbor;
+        leafNeighbor.insert(center);
+        leaf.setNeighbors(leafNeighbor);
     }
-    std::vector<Node*> leaves(nodes.begin()+1,nodes.end());
-    center->setNeighbors(leaves);
+    std::vector<Node> leaves(nodes+1,nodes+numNodes);
+    center.setNeighbors(leaves);
     return nodes;
 }
 
 /// Generate a random network with n nodes arranged in the grid topology
-std::vector<Node*> gridGen(int numNodes, int numColumns) {
-    std::vector<Node*> nodes(numNodes);
+Node* gridGen(int numNodes, int numColumns) {
+    Node* nodes = new Node[numNodes];
     for(int i=0;i<numNodes;i++){
-        std::vector<Node*> neighbors;
+        std::set<Node> neighbors;
         if(i - numColumns >= 0){
-            neighbors.push_back(nodes[i-numColumns]);
+            neighbors.insert(nodes[i-numColumns]);
         }
         if(i + numColumns < numNodes){
-            neighbors.push_back(nodes[i+numColumns]);
+            neighbors.insert(nodes[i+numColumns]);
         }
         if(i%numColumns!=0){
-            neighbors.push_back(nodes[i-1]);
+            neighbors.insert(nodes[i-1]);
         }
         if((i+1)%numColumns!=0 && i+1 < numNodes){
-            neighbors.push_back(nodes[i+1]);
+            neighbors.insert(nodes[i+1]);
         }
-        nodes[i]->setNeighbors(neighbors);
+        nodes[i].setNeighbors(neighbors);
     }
     return nodes;
 }
 
 /// Generate a random network with n nodes arranged in the mesh topology
-void meshGen(int numNodes, std::vector<Node> & nodes) {
+Node* meshGen(int numNodes, std::vector<std::vector<std::string>>& neighborList) {
+    Node* nodes= new Node[numNodes+1];
+    /*for(int i = 1; i < numNodes+1; i++) {     //create nodes with messages and tick time
+        nodes.at(i) = new Node(i);
+    }*/
+    for(int i = 1; i < neighborList.size(); i++) {
+        std::set<Node> neighbors;
+        for(int j = 0; j < neighborList.at(i).size(); j++) {
+            neighbors.insert(nodes[std::stoi(neighborList.at(i).at(j))]);
+        }
+        nodes[i].setNeighbors(neighbors);
+    }
+    return nodes;
 
 }
 
-/// Generates the Galois Field GF(2^m) in a Matrix object
-Matrix getGaloisField(int m) { // Returns GF(2^m) //if a field is calculated, don’t re-calculate
-
-}

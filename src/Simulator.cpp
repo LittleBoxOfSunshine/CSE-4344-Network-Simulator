@@ -13,7 +13,7 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<std::pair<unsigned 
         , nodeCount{nodeCount}
         , unaddedPackets{packets}
 {
-    int numPackets=packets.size();
+    unsigned long numPackets=packets.size();
     for(int i = 0;i<numPackets;i++) {
         this->numDestinations+=packets[i].second.getDestination().size();
     }
