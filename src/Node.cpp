@@ -115,7 +115,7 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
                         temp.end(),
                         (*itr).getDestination().begin(),
                         (*itr).getDestination().end(),
-                        temp
+                        temp.begin()
                 );
 
             this->emitRTS(this->uniqueID, temp);
