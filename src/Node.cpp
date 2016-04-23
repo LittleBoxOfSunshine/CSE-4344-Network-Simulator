@@ -127,3 +127,45 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
 
     this->lastTickActed = tick;
 }
+
+void Node::emitCTS(unsigned short sourceID, unsigned short destinationID, const unsigned int &tick) {
+    //call receive cts on all neighbors
+    for(auto &i : neighbors) {
+        receiveCTS(sourceID, destinationID, tick);
+    }
+}
+
+void Node::emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID) {
+    //call receive rts on all neighbors
+    for(auto &i : neighbors) {
+        receiveRTS(sourceID, destinationID);
+    }
+}
+
+void Node::receiveCTS(unsigned short rstSourceID, unsigned short rstDestinationID, const unsigned int &tick) {
+    if(sourceIDCTS == uniqueID) {
+        canSend = true;
+        lastSuccessfulRTSTick = tick -1;
+    }
+    else {
+        backoffCounter++;
+    }
+}
+
+void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID) {
+    if(!collision) {
+        if(sourceIDRTS == 0) {
+            if(destinationID.find(uniqueID) != destinationID.end()) {
+                sourceIDRTS = sourceID;
+            }
+            else {
+                backoffCounter = rand() % 2u << expCounter;
+                expCounter++;
+            }
+        }
+    }
+    else {
+        collision = true;
+        sourceIDRTS = 0;
+    }
+}
