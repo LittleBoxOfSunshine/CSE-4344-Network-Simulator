@@ -109,7 +109,7 @@ int main( int argc, char * argv[] ) {
 
         messageFile.close();
         // Create random network
-        Simulator simulation(nodes,packets);
+        Simulator simulation(nodes,numNodes,packets);
         simulation.start();
         // Create & start simulator
         //Simulator exampleSimulator;
