@@ -82,10 +82,12 @@ void Simulator::start() {
     // TODO: Eric
     // TODO: Mike
     while (this->numDestinations > 0){
+        this->runTick();
         while(Packet transmitted = transmittedPackets.pop()){
             numDestinations--;
             std::string packetMessage = "Packet #" + std::to_string(transmitted.getUniqueID()) + " has reached a destination.";
             this->log(packetMessage);
         }
     }
+    this->simulating=false;
 }
