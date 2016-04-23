@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -11,8 +12,9 @@
 #include "Simulator.hpp"
 
 // Prototypes for network initialization
-std::vector<Node*> starGen(int numNodes, std::vector<Node> & nodes);
-std::vector<Node*> gridGen(int numNodes, std::vector<Node> & nodes);
+
+std::vector<Node*> starGen(int numNodes);
+std::vector<Node*> gridGen(int numNodes, int numColumns);
 void meshGen(int numNodes, std::vector<std::vector<std::string>>& neighbors);
 Matrix getGaloisField(int m); // Returns GF(2^m) //if a field is calculated, don’t re-calculate
 
@@ -37,6 +39,11 @@ int main( int argc, char * argv[] ) {
             configFile >> numCol;       //get number of columns
 
             //CREATE TOPOLOGY HERE
+            std::vector<Node*> nodes = gridGen(numNodes,numCol);
+
+        }
+        else if(topologyType.compare("Star") == 0){
+            std::vector<Node*> nodes = starGen(numNodes);
         }
         else if(topologyType.compare("Mesh") == 0) {
             std::vector<std::vector<std::string>> neighbors(numNodes+1);    //vector for neighbors; ID used as index
