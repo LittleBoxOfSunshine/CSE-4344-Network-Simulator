@@ -101,31 +101,6 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
     this->lastTickActed = tick;
 }
 
-/*
-void Node::emitRTS() {
-    for( auto &n : this->neighbors )
-        n->receiveRTS();
-}
-
-void Node::emitCTS() {
-    for( auto &n : this->neighbors )
-        n->receiveCTS();
-}
-
-void Node::receiveRTS(unsigned int sourceID, unsigned int destinationID) {
-    this->receivedRTS = true;
-
-}
-
-void Node::receiveCTS(unsigned int rtsSourceID, unsigned int rtsDestinationID) {
-
-    // CTS intended for this node and is the only CTS received
-    if(rtsSourceID == this->uniqueID)
-
-        this->receivedCTS = true;
-}
-*/
-
 // Determine if temp packet received and if should be added
 void Node::transmitterAction() {
 

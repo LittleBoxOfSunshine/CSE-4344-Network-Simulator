@@ -1,6 +1,5 @@
 //
 // Created by cahenk on 4/17/16.
-// Written by Eric Smith
 //
 
 #ifndef SIMULATOR_SIMULATOR_HPP
