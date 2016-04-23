@@ -81,7 +81,14 @@ void Simulator::start() {
 
     while (this->numDestinations > 0){
         this->runTick();
-        while(Packet transmitted = transmittedPackets.pop()){
+        Packet transmitted;
+        bool queueEmpty = false;
+        while(!queueEmpty){
+            transmitted = transmittedPackets.front();
+            transmittedPackets.pop();
+            if(transmittedPackets.empty()){
+                queueEmpty = true;
+            }
             numDestinations--;
             std::string packetMessage = "Packet #" + std::to_string(transmitted.getUniqueID()) + " has reached a destination.";
             this->log(packetMessage);
