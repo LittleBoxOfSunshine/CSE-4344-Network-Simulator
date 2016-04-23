@@ -59,7 +59,7 @@ int main( int argc, char * argv[] ) {
                 }
             }
             //CREATE TOPOLOGY HERE
-            ::meshGen(numNodes, neighbors);
+            std::vector<Node*> nodes = meshGen(numNodes, neighbors);
         }
 
         //only for mesh networks
