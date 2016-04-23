@@ -32,12 +32,13 @@ private:
     bool canSend = false;
     unsigned int outQueueCount;
     unsigned int lastSuccessfulRTSTick;
+    int queueDelayTick = 0;
 
     static unsigned int sequenceID;
     unsigned short uniqueID;
     std::set<Node*> neighbors;
     std::queue<Packet> inputBuffer;
-    std::priority_queue<Packet, std::vector<Packet>, PacketComparison> outputBuffer;
+    std::vector<Packet> outputBuffer;
     std::unordered_map<unsigned short, Node*> routingTable;
 
     unsigned int queueCount; // The number of packets that have been added to the queue during this tick
@@ -56,7 +57,7 @@ public:
     Node(unsigned short uniqueID);
     void setNeighbors(std::set<Node*> & neighbors);
     void receivePacket(const Packet & packet, const unsigned int & tick); // Called by neighbor nodes when they send a packet
-    void queuePacket(const Packet & p); // Called by simulator when a packet is "created" for the node to send
+    void queuePacket(const Packet & p, const unsigned int & tick); // Called by simulator when a packet is "created" for the node to send
     void slotAction(const unsigned int & tick, std::queue<Packet> & transmittedPackets);
                     // Called by simulator to run the node's actions during the current time slot (tick)
     void receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID);

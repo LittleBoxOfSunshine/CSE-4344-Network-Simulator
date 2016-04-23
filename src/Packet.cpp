@@ -28,7 +28,7 @@ unsigned int Packet::getUniqueID() { return this->uniqueID; }
 
 unsigned int Packet::getCreationTick() const { return this->creationTick; }
 
-bool Packet::isHighPriority() { return this->highPriority; }
+bool Packet::isHighPriority() const { return this->highPriority; }
 
 bool Packet::isLowPriority() { return !this->highPriority; }
 
@@ -46,6 +46,18 @@ void Packet::setHighPriority() { this->highPriority = true; }
 
 void Packet::setLowPriority() { this->highPriority = false; }
 
+bool Packet::findAndRemove(unsigned short destination) {
+    auto temp = this->destination.find(destination);
+
+    if( temp != this->destination.end()) {
+        return false;
+    }
+    else {
+        this->destination.erase(temp);
+        return true;
+    }
+}
+
 bool Packet::operator<(const Packet &rhs) {
     return this->source < rhs.source;
 }
@@ -53,12 +65,3 @@ bool Packet::operator<(const Packet &rhs) {
 bool Packet::operator==(const Packet &rhs) {
     return this->source == rhs.source;
 }
-
-struct PacketComparison{
-    bool operator()(const Packet &lhs, const Packet &rhs) {
-        if( lhs.getPriority() == rhs.getPriority() )
-            return lhs.getCreationTick() < rhs.getCreationTick();
-        else
-            return lhs.getPriority() < rhs.getPriority();
-    }
-};

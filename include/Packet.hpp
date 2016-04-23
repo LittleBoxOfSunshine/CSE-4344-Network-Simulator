@@ -30,7 +30,7 @@ public:
     const std::set<unsigned short>& getDestination() const;
     bool getPriority() const;
 
-    bool isHighPriority();
+    bool isHighPriority() const;
     bool isLowPriority();
 
     void setUniqueID(unsigned int uniqueID);
@@ -44,6 +44,8 @@ public:
 
     bool operator<(const Packet &rhs);
     bool Packet::operator==(const Packet &rhs);
+
+    bool findAndRemove(unsigned short destination); // true or false if found. if found then removes
 };
 
 
