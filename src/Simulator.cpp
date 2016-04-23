@@ -70,8 +70,8 @@ void Simulator::runTick() {
     }
 
     // Have all nodes act
-    for(auto &n : this->nodes)
-        n.slotAction(this->currentTick, Simulator::transmittedPackets);
+    for(int i = 0; i < this->nodeCount; i++)
+        this->nodes[i].slotAction(this->currentTick, Simulator::transmittedPackets);
 }
 
 void Simulator::start() {

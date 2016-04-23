@@ -67,12 +67,7 @@ void Node::queuePacket(const Packet &p) {
 }
 
 void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmittedPackets) {
-    // TODO: This should ensure that collisions are handled properly
-    // TODO: Implement this function
-
-    this->transmitterAction();
-
-    ////////////////// DECODE OPERATION //////////////////
+    ////////////////// READ //////////////////
 
     // Process Packet in input buffer (if one exists)
     if( this->inputBuffer.size() - this->queueCount == 1) {
@@ -109,6 +104,20 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
     }
     else if(this->inputBuffer.size() - this->queueCount > 1){
         std::cerr << "ERROR: inputBuffer.size() = " << this->inputBuffer.size() << " is invalid. Must be 0 or 1..." << std::endl;
+    }
+
+    ////////////////// SEND + SCHEDULE //////////////////
+
+    if( this->canSend ){
+
+    }
+    else if( this->backoffCounter == 0 ){
+        if( !this->outputBuffer.empty() ) {
+            //this->emitRTS(this->uniqueID, );
+        }
+    }
+    else{
+        this->backoffCounter--;
     }
 
     this->lastTickActed = tick;
