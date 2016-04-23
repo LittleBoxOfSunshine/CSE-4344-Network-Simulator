@@ -13,9 +13,9 @@
 
 // Prototypes for network initialization
 
-std::vector<Node*> starGen(int numNodes);
-std::vector<Node*> gridGen(int numNodes, int numColumns);
-std::vector<Node*> meshGen(int numNodes, std::vector<std::vector<std::string>>& neighbors);
+Node* starGen(int numNodes);
+Node* gridGen(int numNodes, int numColumns);
+Node* meshGen(int numNodes, std::vector<std::vector<std::string>>& neighbors);
 
 int main( int argc, char * argv[] ) {
 
@@ -38,11 +38,11 @@ int main( int argc, char * argv[] ) {
             configFile >> numCol;       //get number of columns
 
             //CREATE TOPOLOGY HERE
-            std::vector<Node*> nodes = gridGen(numNodes,numCol);
+            Node* nodes = gridGen(numNodes,numCol);
 
         }
         else if(topologyType.compare("Star") == 0){
-            std::vector<Node*> nodes = starGen(numNodes);
+            Node* nodes = starGen(numNodes);
         }
         else if(topologyType.compare("Mesh") == 0) {
             std::vector<std::vector<std::string>> neighbors(numNodes+1);    //vector for neighbors; ID used as index
@@ -59,7 +59,7 @@ int main( int argc, char * argv[] ) {
                 }
             }
             //CREATE TOPOLOGY HERE
-            std::vector<Node*> nodes = meshGen(numNodes, neighbors);
+            Node* nodes = meshGen(numNodes, neighbors);
         }
 
         //only for mesh networks
