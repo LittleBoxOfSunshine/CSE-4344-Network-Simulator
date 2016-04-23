@@ -24,16 +24,14 @@ private:
 
     const static int MAX_DELAY_FOR_LOW_PRIORITY = 10;
 
-    bool receivedRTS = false;
-    bool receivedCTS = false;
-    bool overheardRTS = false;
-    bool overheardCTS = false;
-    bool collisionDetected = false;
-    bool emittedRTS = false;
-    bool emittedCTS = false;
-
+    bool collision = false;
+    unsigned short sourceIDRTS = 0;
+    unsigned short sourceIDCTS = 0;
     unsigned int backoffCounter;
-    uint8_t backoffExponent;
+    uint8_t expCounter;
+    bool canSend = false;
+    unsigned int outQueueCount;
+    unsigned int lastSuccessfulRTSTick;
 
     static unsigned int sequenceID;
     unsigned short uniqueID;
@@ -53,7 +51,7 @@ private:
     void transmitterAction(); // NOTE: This must check RTS/CTS and should also apply collisions (CSMA/CA)
                                 // NOTE: will need some more member variables for this function
 
-    void emitCTS(unsigned short sourceID, unsigned short destinationID);
+    void emitCTS(unsigned short sourceID, unsigned short destinationID, const unsigned int & tick);
     void emitRTS(unsigned short sourceID, unsigned short destinationID);
 
 public:
@@ -65,7 +63,7 @@ public:
     void slotAction(const unsigned int & tick, std::queue<Packet> & transmittedPackets);
                     // Called by simulator to run the node's actions during the current time slot (tick)
     void receiveRTS(unsigned short sourceID, unsigned short destinationID);
-    void receiveCTS(unsigned short rstSourceID, unsigned short rstDestinationID);
+    void receiveCTS(unsigned short rstSourceID, unsigned short rstDestinationID, const unsigned int & tick);
     void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
 };
 
