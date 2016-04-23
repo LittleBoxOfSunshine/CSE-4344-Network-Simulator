@@ -53,7 +53,7 @@ std::vector<Node*> gridGen(int numNodes, int numColumns) {
 }
 
 /// Generate a random network with n nodes arranged in the mesh topology
-void meshGen(int numNodes, std::vector<std::vector<std::string>>& neighborList) {
+std::vector<Node*> meshGen(int numNodes, std::vector<std::vector<std::string>>& neighborList) {
     std::vector<Node*> nodes(numNodes+1);
     for(int i = 1; i < nodes.size(); i++) {     //create nodes with messages and tick time
         nodes.at(i) = new Node(i);
@@ -65,6 +65,7 @@ void meshGen(int numNodes, std::vector<std::vector<std::string>>& neighborList) 
         }
         nodes.at(i)->setNeighbors(neighbors);
     }
+    return nodes;
 
 }
 

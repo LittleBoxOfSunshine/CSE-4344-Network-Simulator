@@ -15,8 +15,7 @@
 
 std::vector<Node*> starGen(int numNodes);
 std::vector<Node*> gridGen(int numNodes, int numColumns);
-void meshGen(int numNodes, std::vector<std::vector<std::string>>& neighbors);
-Matrix getGaloisField(int m); // Returns GF(2^m) //if a field is calculated, don’t re-calculate
+std::vector<Node*> meshGen(int numNodes, std::vector<std::vector<std::string>>& neighbors);
 
 int main( int argc, char * argv[] ) {
 
