@@ -70,7 +70,7 @@ int main( int argc, char * argv[] ) {
         std::ifstream messageFile;
         messageFile.open(messagePath, std::ios::in);
 
-        std::vector<Packet*> packets;
+        std::vector<Packet> packets;
 
         std::string line;
         int id = 1;
@@ -97,7 +97,7 @@ int main( int argc, char * argv[] ) {
             priority = (bool) priorityInput;
 
             for(int i = 0; i < destinations.size(); i++) {
-                packets.push_back(new Packet(id, source, destinations.at(i), tick, priority));
+                packets.push_back(Packet(id, source, destinations.at(i), tick, priority));
                 id++;
             }
 

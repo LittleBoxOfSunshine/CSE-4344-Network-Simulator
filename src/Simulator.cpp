@@ -8,14 +8,14 @@
 std::queue<Packet> Simulator::transmittedPackets;
 bool Simulator::simulating = true;
 
-Simulator::Simulator(Node* nodes, int nodeCount, std::vector<std::pair<unsigned int, Packet>> packets)
+Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets)
         : nodes{nodes}
         , nodeCount{nodeCount}
         , unaddedPackets{packets}
 {
     unsigned long numPackets=packets.size();
     for(int i = 0;i<numPackets;i++) {
-        this->numDestinations+=packets[i].second.getDestination().size();
+        this->numDestinations+=packets[i].getDestination().size();
     }
     //create file at location specified in home dir
     std::string path(getenv("HOME"));
@@ -63,9 +63,9 @@ void Simulator::log(std::vector<std::string> logVector){
 
 void Simulator::runTick() {
     // Queue packets in nodes to simulate them being "created" for the node to send when it can
-    while(this->unaddedPackets[this->packetIndex].first <= this->currentTick) {
-        this->nodes[this->unaddedPackets[this->packetIndex].second.getSource()-1]
-                .queuePacket(this->unaddedPackets[this->packetIndex].second, this->currentTick);
+    while(this->unaddedPackets[this->packetIndex].getCreationTick() <= this->currentTick) {
+        this->nodes[this->unaddedPackets[this->packetIndex].getSource()-1]
+                .queuePacket(this->unaddedPackets[this->packetIndex], this->currentTick);
         packetIndex++;
     }
 

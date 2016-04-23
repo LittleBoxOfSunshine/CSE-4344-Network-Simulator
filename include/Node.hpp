@@ -51,7 +51,6 @@ private:
     void sendPacket(const Packet & packet, const unsigned int &tick);
     void emitCTS(unsigned short sourceID, const unsigned int & tick);
     void emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID);
-    void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
     std::vector<Node*>& buildTopology(); // fills allNodes to create topology of network
 
 public:
@@ -64,6 +63,7 @@ public:
                     // Called by simulator to run the node's actions during the current time slot (tick)
     void receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID);
     void receiveCTS(unsigned short rstSourceID, const unsigned int & tick);
+    void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
 };
 
 #endif //SIMULATOR_NODE_HPP

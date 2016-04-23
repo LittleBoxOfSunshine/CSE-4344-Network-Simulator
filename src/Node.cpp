@@ -7,7 +7,7 @@
 #include "Node.hpp"
 #include "Simulator.hpp"
 
-unsigned int Node::sequenceID = 1;
+unsigned short Node::sequenceID = 1;
 
 void Node::sendPacket(const Packet & packet, const unsigned int &tick) {
     if( packet.getDestination().size() == 1){
