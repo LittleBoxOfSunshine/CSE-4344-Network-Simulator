@@ -123,6 +123,63 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
     this->lastTickActed = tick;
 }
 
+void Node::emitCTS(unsigned short sourceID, unsigned short destinationID, const unsigned int &tick) {
+    //call receive cts on all neighbors
+    for(auto &i : neighbors) {
+        receiveCTS(sourceID, destinationID, tick);
+    }
+}
+
+void Node::emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID) {
+    //call receive rts on all neighbors
+    for(auto &i : neighbors) {
+        receiveRTS(sourceID, destinationID);
+    }
+}
+
+void Node::receiveCTS(unsigned short rstSourceID, unsigned short rstDestinationID, const unsigned int &tick) {
+    //if srcID == us
+        //can send = true
+    //last successfulTick =tick-1
+    //else
+        //backoffcounter++;
+    if(sourceIDCTS == uniqueID) {
+        canSend = true;
+        lastSuccessfulRTSTick = tick -1;
+    }
+    else {
+        backoffCounter++;
+    }
+}
+
+void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID) {
+    //if !collision
+        //if sourceIDRTS == 0
+            //if destID == us
+                //sourceIDRTS = sourceID
+            //else
+                //backoffcounter = rand(0, 2<<expcounter)
+                //expCOunter++;
+    //else
+        //collision = true
+        //sourceIDRTS = 0;
+    if(!collision) {
+        if(sourceIDRTS == 0) {
+            if(destinationID.find(uniqueID) != destinationID.end()) {
+                sourceIDRTS = sourceID;
+            }
+            else {
+                backoffCounter = rand() % 0 + 2 << expCounter;//
+                expCounter++;
+            }
+        }
+    }
+    else {
+        collision = true;
+        sourceIDRTS = 0;
+    }
+}
+
 // Determine if temp packet received and if should be added
 void Node::transmitterAction() {
 
