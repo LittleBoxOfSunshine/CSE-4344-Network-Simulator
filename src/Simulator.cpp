@@ -6,6 +6,7 @@
 #include "Simulator.hpp"
 
 std::queue<Packet> Simulator::transmittedPackets;
+bool Simulator::simulating = true;
 
 Simulator::Simulator(std::vector<Node> & nodes, std::vector<std::pair<unsigned int, Packet>> packets):
 nodes(nodes), unaddedPackets(packets){
@@ -19,6 +20,7 @@ nodes(nodes), unaddedPackets(packets){
 }
 
 Simulator::~Simulator(){
+    Simulator::simulating = false;
     simulatorThread.join();
     out.close();
 }
@@ -26,12 +28,14 @@ Simulator::~Simulator(){
 //print to file if Simulator queue isn't empty
 //elsewise sleep for user defined time
 void Simulator::handler() {
-    if( !queue.getQueue().empty() ){
-        //print to file
-        out << queue.pop() << "\n";
-    }
-    else{
-        sleep(sleepTime);
+    while(Simulator::simulating) {
+        if (!queue.getQueue().empty()) {
+            //print to file
+            out << queue.pop() << "\n";
+        }
+        else {
+            sleep(sleepTime);
+        }
     }
 }
 

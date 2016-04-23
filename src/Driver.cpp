@@ -20,7 +20,7 @@ Node* meshGen(int numNodes, std::vector<std::vector<std::string>>& neighbors);
 int main( int argc, char * argv[] ) {
 
     // Check that required command line args were supplied
-    if( argc == 2 ){
+    if( argc == 3 ){
         // Load config
         std::string configPath(getenv("HOME"));
         configPath += "/ClionProjects/simulator/configs/";
@@ -61,12 +61,52 @@ int main( int argc, char * argv[] ) {
             //CREATE TOPOLOGY HERE
             Node* nodes = meshGen(numNodes, neighbors);
         }
+        configFile.close();
 
         //only for mesh networks
 
         // Load messages
         //std::ifstream messageFile(argv[1], std::ios::in);
+        std::string messagePath(getenv("HOME"));
+        messagePath += "/ClionProjects/simulator/configs/";
+        messagePath += argv[2];
+        std::ifstream messageFile;
+        messageFile.open(messagePath, std::ios::in);
 
+        std::vector<Packet*> packets;
+
+        std::string line;
+        int id = 1;
+        while(getline(messageFile, line)) {
+            int source;
+            std::vector<int> destinations;
+            int tick;
+            bool priority;
+
+            int priorityInput;
+            std::stringstream stream(line);
+            stream >> source;
+            stream.ignore();        //ignore space
+            stream.ignore();        //ignore '['
+            while(stream.peek() != ']') {
+                int temp;
+                stream >> temp;
+                destinations.push_back(temp);
+            }
+            stream.ignore();        //ignore space
+            stream >> tick;
+            stream.ignore();
+            stream >> priorityInput;
+            priority = (bool) priorityInput;
+
+            for(int i = 0; i < destinations.size(); i++) {
+                packets.push_back(new Packet(id, source, destinations.at(i), tick, priority));
+                id++;
+            }
+
+        }
+
+        messageFile.close();
         // Create random network
 
         // Create & start simulator
