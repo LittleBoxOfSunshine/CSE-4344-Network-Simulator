@@ -29,16 +29,17 @@ int main( int argc, char * argv[] ) {
         getline(configFile, topologyType);
         configFile >> numNodes;
         configFile.ignore();
+        Node* nodes;
         if(topologyType.compare("Grid") == 0) {
             int numCol;
             configFile >> numCol;       //get number of columns
 
             //CREATE TOPOLOGY HERE
-            Node* nodes = gridGen(numNodes,numCol);
+            nodes = gridGen(numNodes,numCol);
 
         }
         else if(topologyType.compare("Star") == 0){
-            Node* nodes = starGen(numNodes);
+            nodes = starGen(numNodes);
         }
         else if(topologyType.compare("Mesh") == 0) {
             std::vector<std::vector<std::string>> neighbors(numNodes+1);    //vector for neighbors; ID used as index
@@ -55,7 +56,7 @@ int main( int argc, char * argv[] ) {
                 }
             }
             //CREATE TOPOLOGY HERE
-            Node* nodes = meshGen(numNodes, neighbors);
+             nodes = meshGen(numNodes, neighbors);
         }
         configFile.close();
 
@@ -104,7 +105,8 @@ int main( int argc, char * argv[] ) {
 
         messageFile.close();
         // Create random network
-
+        Simulator simulation(nodes,numNodes,packets);
+        simulation.start();
         // Create & start simulator
         //Simulator exampleSimulator;
         //exampleSimulator.log("testdata1,testdata2");
