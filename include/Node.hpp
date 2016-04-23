@@ -21,7 +21,7 @@ private:
     static unsigned int sequenceID;
     unsigned int uniqueID;
     unsigned short groupID;
-    std::vector<Node*> neighbors;
+    std::vector<Node*> neighbors; //constant weight of 1 from each node to the next
     std::vector<Packet> packetCache;
     std::queue<Packet> inputBuffer;
     std::priority_queue<Packet> outputBuffer;
