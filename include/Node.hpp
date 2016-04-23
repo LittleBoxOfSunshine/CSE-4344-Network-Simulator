@@ -22,10 +22,11 @@ private:
     unsigned int uniqueID;
     unsigned short groupID;
     std::vector<Node*> neighbors; //constant weight of 1 from each node to the next
+    std::vector<Node*> allNodes; //list of all nodes in the network for Dijkstra's
     std::vector<Packet> packetCache;
     std::queue<Packet> inputBuffer;
     std::priority_queue<Packet> outputBuffer;
-    std::unordered_map<unsigned int, Node*> routingTable;
+    std::unordered_map<Node*, unsigned int> routingTable;
     bool receivedCTS;
     bool receivedRTS;
 
@@ -38,6 +39,7 @@ private:
 
     void sendPacket(const Packet & packet, const int &tick);
     void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
+    void buildTopology(); // fills allNodes to create topology of network
     void transmitterAction(); // NOTE: This must check RTS/CTS and should also apply collisions (CSMA/CA)
                                 // NOTE: will need some more member variables for this function
     Packet* processorAction(); // NOTE: at most 1 encode or decode per tick, this is also where routing happens
@@ -49,12 +51,16 @@ public:
     Node();
     Node(unsigned int uniqueID);
     void setNeighbors(std::vector<Node*> & neighbors);
+    std::vector<Node*> & getNeighbors();
+    unsigned int getUniqueID();
     void receivePacket(const Packet & packet, const int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p); // Called by simulator when a packet is "created" for the node to send
     void slotAction(const int & tick, std::queue<Packet> & transmittedPackets);
                     // Called by simulator to run the node's actions during the current time slot (tick)
     void receiveRTS();
     void receiveCTS();
+
+    void printRoutingTable();
 };
 
 #endif //SIMULATOR_NODE_HPP

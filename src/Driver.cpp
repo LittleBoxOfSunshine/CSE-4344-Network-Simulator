@@ -4,21 +4,23 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <string>
+#include <vector>
 #include <sstream>
 #include "matrix.hpp"
 #include "Simulator.hpp"
 
 // Prototypes for network initialization
-std::vector<Node*> starGen(int numNodes, std::vector<Node> & nodes);
-std::vector<Node*> gridGen(int numNodes, std::vector<Node> & nodes);
-void meshGen(int numNodes, std::vector<Node> & nodes);
-Matrix getGaloisField(int m); // Returns GF(2^m) //if a field is calculated, don’t re-calculate
+
+Node* starGen(int numNodes);
+Node* gridGen(int numNodes, int numColumns);
+Node* meshGen(int numNodes, std::vector<std::vector<std::string>>& neighbors);
 
 int main( int argc, char * argv[] ) {
 
     // Check that required command line args were supplied
-    if( argc == 2 ){
+    if( argc == 3 ){
         // Load config
         std::string configPath(getenv("HOME"));
         configPath += "/ClionProjects/simulator/configs/";
@@ -36,10 +38,15 @@ int main( int argc, char * argv[] ) {
             configFile >> numCol;       //get number of columns
 
             //CREATE TOPOLOGY HERE
+            Node* nodes = gridGen(numNodes,numCol);
+
+        }
+        else if(topologyType.compare("Star") == 0){
+            Node* nodes = starGen(numNodes);
         }
         else if(topologyType.compare("Mesh") == 0) {
             std::vector<std::vector<std::string>> neighbors(numNodes+1);    //vector for neighbors; ID used as index
-            for(int i = 0; i < numNodes; i++) {
+            for(int i = 1; i < numNodes+1; i++) {
                 std::string buffer;
                 int nodeid;             //gets id for node
                 configFile >> nodeid;
@@ -52,13 +59,54 @@ int main( int argc, char * argv[] ) {
                 }
             }
             //CREATE TOPOLOGY HERE
+            Node* nodes = meshGen(numNodes, neighbors);
         }
+        configFile.close();
 
         //only for mesh networks
 
         // Load messages
         //std::ifstream messageFile(argv[1], std::ios::in);
+        std::string messagePath(getenv("HOME"));
+        messagePath += "/ClionProjects/simulator/configs/";
+        messagePath += argv[2];
+        std::ifstream messageFile;
+        messageFile.open(messagePath, std::ios::in);
 
+        std::vector<Packet*> packets;
+
+        std::string line;
+        int id = 1;
+        while(getline(messageFile, line)) {
+            int source;
+            std::vector<int> destinations;
+            int tick;
+            bool priority;
+
+            int priorityInput;
+            std::stringstream stream(line);
+            stream >> source;
+            stream.ignore();        //ignore space
+            stream.ignore();        //ignore '['
+            while(stream.peek() != ']') {
+                int temp;
+                stream >> temp;
+                destinations.push_back(temp);
+            }
+            stream.ignore();        //ignore space
+            stream >> tick;
+            stream.ignore();
+            stream >> priorityInput;
+            priority = (bool) priorityInput;
+
+            for(int i = 0; i < destinations.size(); i++) {
+                packets.push_back(new Packet(id, source, destinations.at(i), tick, priority));
+                id++;
+            }
+
+        }
+
+        messageFile.close();
         // Create random network
 
         // Create & start simulator
