@@ -4,7 +4,8 @@
 
 #include <iostream>
 #include <fstream>
-
+#include <string>
+#include <sstream>
 #include "matrix.hpp"
 #include "Simulator.hpp"
 
@@ -13,17 +14,50 @@ std::vector<Node*> starGen(int numNodes, std::vector<Node> & nodes);
 std::vector<Node*> gridGen(int numNodes, std::vector<Node> & nodes);
 void meshGen(int numNodes, std::vector<Node> & nodes);
 Matrix getGaloisField(int m); // Returns GF(2^m) //if a field is calculated, don’t re-calculate
-/*
+
 int main( int argc, char * argv[] ) {
 
     // Check that required command line args were supplied
-    if( argc == 3 ){
+    if( argc == 2 ){
         // Load config
-        std::ifstream configFile(argv[2], std::ios::in);
+        std::string configPath(getenv("HOME"));
+        configPath += "/ClionProjects/simulator/configs/";
+        configPath += argv[1];
+        std::ifstream configFile;
+        configFile.open(configPath, std::ios::in);
 
+        std::string topologyType;        //type of topology
+        int numNodes;                   //number of nodes
+        getline(configFile, topologyType);
+        configFile >> numNodes;
+        configFile.ignore();
+        if(topologyType.compare("Grid") == 0) {
+            int numCol;
+            configFile >> numCol;       //get number of columns
+
+            //CREATE TOPOLOGY HERE
+        }
+        else if(topologyType.compare("Mesh") == 0) {
+            std::vector<std::vector<std::string>> neighbors(numNodes+1);    //vector for neighbors; ID used as index
+            for(int i = 0; i < numNodes; i++) {
+                std::string buffer;
+                int nodeid;             //gets id for node
+                configFile >> nodeid;
+                configFile.ignore();
+                getline(configFile, buffer);        //get whole line of neighbors for parsing
+                std::stringstream stream(buffer);
+                std::string temp;
+                while(stream >> temp) {         //parse whole line and push to vector
+                    neighbors.at(nodeid).push_back(temp);
+                }
+            }
+            //CREATE TOPOLOGY HERE
+        }
+
+        //only for mesh networks
 
         // Load messages
-        std::ifstream messageFile(argv[1], std::ios::in);
+        //std::ifstream messageFile(argv[1], std::ios::in);
 
         // Create random network
 
@@ -39,9 +73,9 @@ int main( int argc, char * argv[] ) {
     }
 }
 
-*/
 
-int main(){
+
+/*int main(){
 
     return 0;
-}
+}*/
