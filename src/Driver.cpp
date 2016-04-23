@@ -95,7 +95,6 @@ int main( int argc, char * argv[] ) {
             }
             stream.ignore();        //ignore space
             stream >> tick;
-            std::cout << tick << std::endl;
             stream.ignore();
             stream >> priorityInput;
             priority = (bool) priorityInput;
