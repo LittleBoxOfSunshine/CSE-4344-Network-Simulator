@@ -4,29 +4,108 @@
 
 #include <iostream>
 #include <fstream>
-#include <algorithm>
-#include <climits>
-
+#include <vector>
+#include <string>
+#include <vector>
+#include <sstream>
 #include "matrix.hpp"
 #include "Simulator.hpp"
 
 // Prototypes for network initialization
-std::vector<Node*> starGen(int numNodes, std::vector<Node> & nodes);
-std::vector<Node*> gridGen(int numNodes, std::vector<Node> & nodes);
-void meshGen(int numNodes, std::vector<Node> & nodes);
-Matrix getGaloisField(int m); // Returns GF(2^m) //if a field is calculated, don’t re-calculate
+
+std::vector<Node*> starGen(int numNodes);
+std::vector<Node*> gridGen(int numNodes, int numColumns);
+std::vector<Node*> meshGen(int numNodes, std::vector<std::vector<std::string>>& neighbors);
 
 int main( int argc, char * argv[] ) {
 
     // Check that required command line args were supplied
     if( argc == 3 ){
         // Load config
-        std::ifstream configFile(argv[2], std::ios::in);
+        std::string configPath(getenv("HOME"));
+        configPath += "/ClionProjects/simulator/configs/";
+        configPath += argv[1];
+        std::ifstream configFile;
+        configFile.open(configPath, std::ios::in);
 
+        std::string topologyType;        //type of topology
+        int numNodes;                   //number of nodes
+        getline(configFile, topologyType);
+        configFile >> numNodes;
+        configFile.ignore();
+        if(topologyType.compare("Grid") == 0) {
+            int numCol;
+            configFile >> numCol;       //get number of columns
+
+            //Create topology
+            std::vector<Node*> nodes = gridGen(numNodes,numCol);
+
+        }
+        else if(topologyType.compare("Star") == 0){
+            std::vector<Node*> nodes = starGen(numNodes);
+        }
+        else if(topologyType.compare("Mesh") == 0) {
+            std::vector<std::vector<std::string>> neighbors(numNodes+1);    //vector for neighbors; ID used as index
+            for(int i = 1; i < numNodes+1; i++) {
+                std::string buffer;
+                int nodeid;             //gets id for node
+                configFile >> nodeid;
+                configFile.ignore();
+                getline(configFile, buffer);        //get whole line of neighbors for parsing
+                std::stringstream stream(buffer);
+                std::string temp;
+                while(stream >> temp) {         //parse whole line and push to vector
+                    neighbors.at(nodeid).push_back(temp);
+                }
+            }
+            //CREATE TOPOLOGY HERE
+            std::vector<Node*> nodes = meshGen(numNodes, neighbors);
+        }
+        configFile.close();
+
+        //only for mesh networks
 
         // Load messages
-        std::ifstream messageFile(argv[1], std::ios::in);
+        //std::ifstream messageFile(argv[1], std::ios::in);
+        std::string messagePath(getenv("HOME"));
+        messagePath += "/ClionProjects/simulator/configs/";
+        messagePath += argv[2];
+        std::ifstream messageFile;
+        messageFile.open(messagePath, std::ios::in);
 
+        std::vector<Packet*> packets;
+
+        std::string line;
+        while(getline(messageFile, line)) {
+            int source;
+            std::vector<int> destinations;
+            int tick;
+            bool priority;
+
+            int priorityInput;
+            std::stringstream stream(line);
+            stream >> source;
+            stream.ignore();        //ignore space
+            stream.ignore();        //ignore '['
+            while(stream.peek() != ']') {
+                int temp;
+                stream >> temp;
+                destinations.push_back(temp);
+            }
+            stream.ignore();        //ignore space
+            stream >> tick;
+            std::cout << tick << std::endl;
+            stream.ignore();
+            stream >> priorityInput;
+            priority = (bool) priorityInput;
+
+            for(int i = 0; i < destinations.size(); i++) {
+                packets.push_back(new Packet(source, destinations.at(i), tick, priority));
+            }
+
+        }
+
+        messageFile.close();
         // Create random network
 
         // Create & start simulator
@@ -40,3 +119,10 @@ int main( int argc, char * argv[] ) {
                   << "       Proper Usage: <exec_cmd> <topology_conf_path> <message_file_path>" << std::endl;
     }
 }
+
+
+
+/*int main(){
+
+    return 0;
+}*/
