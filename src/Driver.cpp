@@ -76,6 +76,7 @@ int main( int argc, char * argv[] ) {
         std::vector<Packet*> packets;
 
         std::string line;
+        int id = 1;
         while(getline(messageFile, line)) {
             int source;
             std::vector<int> destinations;
@@ -100,7 +101,8 @@ int main( int argc, char * argv[] ) {
             priority = (bool) priorityInput;
 
             for(int i = 0; i < destinations.size(); i++) {
-                packets.push_back(new Packet(source, destinations.at(i), tick, priority));
+                packets.push_back(new Packet(id, source, destinations.at(i), tick, priority));
+                id++;
             }
 
         }
