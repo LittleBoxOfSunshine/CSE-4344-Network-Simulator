@@ -6,9 +6,8 @@
 
 unsigned int Node::sequenceID = 1;
 
-void Node::sendPacket(const Packet & packet, std::set<unsigned int> & macRec, const unsigned int &tick) {
-    // Due to broadcast nature of wireless, all neighbors receive the packet
-    std::set<Node*> recipients;
+void Node::sendPacket(const Packet & packet, const unsigned int &tick) {
+    /*std::set<Node*> recipients;
     std::set_intersection(
             this->neighbors.begin(),
             this->neighbors.end(),
@@ -16,13 +15,28 @@ void Node::sendPacket(const Packet & packet, std::set<unsigned int> & macRec, co
             macRec.end(),
             std::back_inserter(recipients)
     );
+    */
 
-    for( auto &n : recipients)
-        n->receivePacket(packet, tick);
+    if( packet.getDestination().size() == 1){
+        this->routingTable[*packet.getDestination().begin()]->receivePacket(packet, tick);
+    }
+    else{
+        std::multimap<Node*, unsigned short> data;
 
-    //for( auto &n : this->neighbors)
-        //if(maceRec.find(n->uniqueID) != macRec.end())
-            //n->receivePacket(packet, tick);
+        // Place destinations in the map
+        for( auto &d : packet.getDestination())
+            data.emplace(this->routingTable[d], d);
+
+        Packet temp = packet;
+
+        // Send packets
+        for( auto &n : data){
+            // Send modified version of the packet with only 1 destination
+            temp.setDestination(n.second);
+            // Route the packet
+            n.first->receivePacket(temp, tick);
+        }
+    }
 }
 
 void Node::buildRoutes() {
@@ -32,9 +46,8 @@ void Node::buildRoutes() {
 // Needed to create array of <Node> , 0 is reserved to single blank node
 Node::Node() { ++(Node::sequenceID); }
 
-Node::Node(unsigned int uniqueID, unsigned short groupID)
+Node::Node(unsigned short uniqueID)
         : uniqueID{uniqueID}
-        , groupID{groupID}
         { }
 
 void Node::setNeighbors(std::set<Node *> &neighbors) {

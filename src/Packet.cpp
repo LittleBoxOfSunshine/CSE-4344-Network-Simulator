@@ -9,20 +9,24 @@ Packet::Packet() {
     this->highPriority = false;
 }
 
-Packet::Packet(unsigned int uniqueID, unsigned long source, unsigned long destination, bool highPriority)
+Packet::Packet(unsigned int uniqueID, unsigned short source, unsigned short destination, unsigned int creationTick,
+               bool highPriority)
         : uniqueID{uniqueID}
         , source{source}
         , destination{destination}
+        , creationTick{creationTick}
         , highPriority{highPriority}
     {}
 
-unsigned long Packet::getSource() { return this->source; }
+unsigned short Packet::getSource() { return this->source; }
 
-std::set<unsigned long> Packet::getDestination() { return this->destination; }
+const std::set<unsigned short>& Packet::getDestination() const { return this->destination; }
 
 bool Packet::getPriority() const { return this->highPriority; }
 
 unsigned int Packet::getUniqueID() { return this->uniqueID; }
+
+unsigned int Packet::getCreationTick() const { return this->creationTick; }
 
 bool Packet::isHighPriority() { return this->highPriority; }
 
@@ -30,9 +34,11 @@ bool Packet::isLowPriority() { return !this->highPriority; }
 
 void Packet::setUniqueID(unsigned int uniqueID) { this->uniqueID = uniqueID; }
 
-void Packet::setSource(unsigned long source) { this->source = source; }
+void Packet::setSource(unsigned short source) { this->source = source; }
 
-void Packet::setDestination(std::set<unsigned long> destination) { this->destination = destination; }
+void Packet::setDestination(std::set<unsigned short> destination) { this->destination = destination; }
+
+void Packet::setDestination(unsigned short destination) { this->destination = {destination}; }
 
 void Packet::setPriority(bool highPriority) { this->highPriority = highPriority; }
 
@@ -50,6 +56,9 @@ bool Packet::operator==(const Packet &rhs) {
 
 struct PacketComparison{
     bool operator()(const Packet &lhs, const Packet &rhs) {
-        return lhs.getPriority() < rhs.getPriority();
+        if( lhs.getPriority() == rhs.getPriority() )
+            return lhs.getCreationTick() < rhs.getCreationTick();
+        else
+            return lhs.getPriority() < rhs.getPriority();
     }
 };

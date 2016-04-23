@@ -13,26 +13,30 @@ class Packet {
 private:
 
     unsigned int uniqueID;
-    unsigned long source; // Unique ID of the source
-    std::set<unsigned long> destination; // Unique ID of the destination
+    unsigned int creationTick;
+    unsigned short source; // Unique ID of the source
+    std::set<unsigned short> destination; // Unique ID of the destination
     bool highPriority; // Signals message must be sent ASAP (true) or it can be delayed for linear combination (false)
 
 public:
 
     Packet();
-    Packet(unsigned int uniqueID, unsigned long source, unsigned long destination, bool highPriority=false);
+    Packet(unsigned int uniqueID, unsigned short source, unsigned short destination, unsigned int creationTick,
+           bool highPriority=false);
 
     unsigned int getUniqueID();
-    unsigned long getSource();
-    std::set<unsigned long> getDestination();
+    unsigned int getCreationTick() const;
+    unsigned short getSource();
+    const std::set<unsigned short>& getDestination() const;
     bool getPriority() const;
 
     bool isHighPriority();
     bool isLowPriority();
 
     void setUniqueID(unsigned int uniqueID);
-    void setSource(unsigned long source);
-    void setDestination(std::set<unsigned long> destination);
+    void setSource(unsigned short source);
+    void setDestination(std::set<unsigned short> destination);
+    void setDestination(unsigned short destination);
     void setPriority(bool priority);
 
     void setHighPriority();

@@ -9,8 +9,10 @@
 #include <unordered_map>
 #include <queue>
 #include <set>
+#include <map>
 #include <iostream>
 #include <algorithm>
+#include <cstdint>
 
 #include "Packet.hpp"
 
@@ -20,18 +22,25 @@ struct PacketComparison;
 class Node {
 private:
 
-    //const static unordered_map<unsigned short, std::vector<unsigned int>> GROUP_TABLE;
+    const static int MAX_DELAY_FOR_LOW_PRIORITY = 10;
+
+    bool receivedRTS = false;
+    bool receivedCTS = false;
+    bool overheardRTS = false;
+    bool overheardCTS = false;
+    bool collisionDetected = false;
+    bool emittedRTS = false;
+    bool emittedCTS = false;
+
+    unsigned int backoffCounter;
+    uint8_t backoffExponent;
 
     static unsigned int sequenceID;
-    unsigned int uniqueID;
-    unsigned short groupID;
+    unsigned short uniqueID;
     std::set<Node*> neighbors;
-    //std::vector<Packet> packetCache; Would be used for opportunistic opportunities
     std::queue<Packet> inputBuffer;
     std::priority_queue<Packet, std::vector<Packet>, PacketComparison> outputBuffer;
-    std::unordered_map<unsigned int, Node*> routingTable;
-    Packet readyToSend;
-    bool readyToSendPacketExists = false;
+    std::unordered_map<unsigned short, Node*> routingTable;
 
     unsigned int queueCount; // The number of packets that have been added to the queue during this tick
                              // This is needed to prevent receiving and processing a packet in the same tick
@@ -40,20 +49,23 @@ private:
 
     unsigned int lastTickActed; // Last tick that the node acted on, always updated by Node::slotAction()
 
-    void sendPacket(const Packet & packet, std::set<unsigned int> & macRec, const unsigned int &tick);
+    void sendPacket(const Packet & packet, const unsigned int &tick);
     void transmitterAction(); // NOTE: This must check RTS/CTS and should also apply collisions (CSMA/CA)
                                 // NOTE: will need some more member variables for this function
 
+    void emitCTS(unsigned short sourceID, unsigned short destinationID);
+    void emitRTS(unsigned short sourceID, unsigned short destinationID);
+
 public:
     Node();
-    Node(unsigned int uniqueID, unsigned short groupID=0);
+    Node(unsigned short uniqueID);
     void setNeighbors(std::set<Node*> & neighbors);
     void receivePacket(const Packet & packet, const unsigned int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p); // Called by simulator when a packet is "created" for the node to send
     void slotAction(const unsigned int & tick, std::queue<Packet> & transmittedPackets);
                     // Called by simulator to run the node's actions during the current time slot (tick)
-    //void receiveRTS(unsigned int sourceID, unsigned int destinationID);
-    //void receiveCTS(unsigned int rstSourceID, unsigned int rstDestinationID);
+    void receiveRTS(unsigned short sourceID, unsigned short destinationID);
+    void receiveCTS(unsigned short rstSourceID, unsigned short rstDestinationID);
     void buildRoutes(); // Use Dijkstra's algorithm to build the routing table
 };
 
