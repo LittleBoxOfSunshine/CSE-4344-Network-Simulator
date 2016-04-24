@@ -201,7 +201,7 @@ void Node::buildRoutes() {
     //initialize routingTable
     for(int i=0;i<allNodes.size();i++) {
         //destination, # hops, 1st hop
-        std::tuple<unsigned short, unsigned int, Node*> tempTuple(allNodes.at(i)->uniqueID, UINT_MAX, allNodes.at(i));
+        std::tuple<unsigned short, unsigned int, Node*> tempTuple(allNodes[i]->uniqueID, UINT_MAX, allNodes[i]);
         initialRouting.insert({allNodes[i],tempTuple});
     }
 
@@ -226,7 +226,7 @@ void Node::buildRoutes() {
 
         //find a node not in pathKnown with the minimum current cost
         for(int i=0;i<allNodes.size();i++){
-            std::tuple<unsigned short, unsigned int, Node*> tempTuple = initialRouting.at( allNodes.at(i) );
+            std::tuple<unsigned short, unsigned int, Node*> tempTuple = initialRouting.at( allNodes[i] );
             unsigned int curValue = std::get<1>(tempTuple);
 
             if( (std::find(pathKnown.begin(), pathKnown.end(), allNodes[i]) == pathKnown.end()) && curValue < leastCost ){
