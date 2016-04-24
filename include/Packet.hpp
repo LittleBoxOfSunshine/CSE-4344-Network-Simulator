@@ -28,7 +28,6 @@ public:
     unsigned int getCreationTick() const;
     unsigned short getSource();
     const std::set<unsigned short>& getDestination() const;
-    std::set<unsigned short>& getDestination();
     bool getPriority() const;
 
     bool isHighPriority() const;

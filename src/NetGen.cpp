@@ -23,7 +23,7 @@ Node* starGen(int numNodes) {
         leafNeighbor.insert(&center);
         leaf.setNeighbors(leafNeighbor);
     }
-    std::set<Node*> leaves(nodes+1,nodes+numNodes);
+    std::set<Node*> leaves(&nodes+1,&nodes+numNodes);
     center.setNeighbors(leaves);
     return nodes;
 }

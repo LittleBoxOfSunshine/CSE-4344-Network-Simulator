@@ -22,8 +22,6 @@ unsigned short Packet::getSource() { return this->source; }
 
 const std::set<unsigned short>& Packet::getDestination() const { return this->destination; }
 
-std::set<unsigned short>& Packet::getDestination() { return this->destination; }
-
 bool Packet::getPriority() const { return this->highPriority; }
 
 unsigned int Packet::getUniqueID() { return this->uniqueID; }
