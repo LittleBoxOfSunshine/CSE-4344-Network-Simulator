@@ -60,13 +60,6 @@ Node* meshGen(int numNodes, std::vector<std::vector<std::string>>& neighborList)
         }
         nodes[i].setNeighbors(neighbors);
     }
-    for(int i = 0; i < numNodes; i++) {
-        std::cout << nodes[i].uniqueID << ": ";
-        for(auto itr = nodes[i].neighbors.begin(); itr != nodes[i].neighbors.end(); itr++) {
-            std::cout << (*itr)->uniqueID << " ";
-        }
-        std::cout << std::endl;
-    }
     return nodes;
 
 }

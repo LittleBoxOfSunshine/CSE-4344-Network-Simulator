@@ -35,7 +35,7 @@ private:
 
 public:
     Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets);
-    static std::queue<Packet> transmittedPackets;
+    std::queue<Packet> transmittedPackets;
 
     ~Simulator();
 

@@ -49,7 +49,7 @@ void Packet::setLowPriority() { this->highPriority = false; }
 bool Packet::findAndRemove(unsigned short destination) {
     auto temp = this->destination.find(destination);
 
-    if( temp != this->destination.end()) {
+    if( temp == this->destination.end()) {
         return false;
     }
     else {

@@ -5,7 +5,7 @@
 
 #include "Simulator.hpp"
 
-std::queue<Packet> Simulator::transmittedPackets;
+//std::queue<Packet> Simulator::transmittedPackets;
 bool Simulator::simulating = true;
 
 Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets)
@@ -13,10 +13,10 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets)
         , nodeCount{nodeCount}
         , unaddedPackets{packets}
 {
-    unsigned long numPackets=packets.size();
-    for(int i = 0;i<numPackets;i++) {
+    for(int i = 0;i<packets.size();i++) {
         this->numDestinations+=packets[i].getDestination().size();
     }
+    std::cout << this->numDestinations << " <- numDestinations" << std::endl;
     //create file at location specified in home dir
     std::string path(getenv("HOME"));
     path += "/log.csv";
@@ -48,7 +48,7 @@ void Simulator::handler() {
 
 //write string to log.csv
 void Simulator::log(std::string logString){
-    queue.push(logString);
+    std::cout << logString << std::endl;
 }
 
 //write vector to log.csv, separating values with comma
@@ -63,7 +63,15 @@ void Simulator::log(std::vector<std::string> logVector){
 
 void Simulator::runTick() {
     // Queue packets in nodes to simulate them being "created" for the node to send when it can
-    while(this->unaddedPackets[this->packetIndex].getCreationTick() <= this->currentTick) {
+    while(this->packetIndex < this->unaddedPackets.size() &&
+            this->unaddedPackets[this->packetIndex].getCreationTick() <= this->currentTick) {
+        std::cout << "Adding packet to queue" <<
+                this->unaddedPackets[this->packetIndex].getSource() <<
+                " -> ";
+        auto t = this->unaddedPackets[this->packetIndex].getDestination();
+        for(auto itr = t.begin(); itr != t.end(); itr++)
+            std::cout << *itr << " ";
+        std::cout << std::endl;
         this->nodes[this->unaddedPackets[this->packetIndex].getSource()-1]
                 .queuePacket(this->unaddedPackets[this->packetIndex], this->currentTick);
         packetIndex++;
@@ -72,6 +80,8 @@ void Simulator::runTick() {
     // Have all nodes act
     for(int i = 0; i < this->nodeCount; i++)
         this->nodes[i].slotAction(this->currentTick, Simulator::transmittedPackets);
+
+    this->currentTick++;
 }
 
 void Simulator::start() {
@@ -80,7 +90,9 @@ void Simulator::start() {
         this->nodes[i].buildRoutes();
 
     while (this->numDestinations > 0){
+        std::cout << "Starting Tick " << this->currentTick << std::endl;
         this->runTick();
+        std::cout << "Processing Tick " << this->currentTick-1 << std::endl;
         Packet transmitted;
         while(!transmittedPackets.empty()){
             transmitted = transmittedPackets.front();

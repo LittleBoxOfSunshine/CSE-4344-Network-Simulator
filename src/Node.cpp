@@ -110,22 +110,32 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
 
     ////////////////// SEND + SCHEDULE //////////////////
 
-    if( this->sourceIDCTS != 0 ) {
-        this->emitCTS(this->uniqueID, tick);
-        this->sourceIDCTS = 0;
+    if( this->sourceIDRTS != 0 && backoffCounter == 0 ) {
+        this->emitCTS(this->sourceIDRTS, tick);
+        this->sourceIDRTS = 0;
     }
-    if( this->canSend ){
+    else if( this->canSend ){
+        std::cout << "SENDING PACKET FROM NODE: " << uniqueID << std::endl;
         while(this->outputBuffer.size() - this->outQueueCount > 0) {
             this->sendPacket(this->outputBuffer.front(), tick);
             this->outputBuffer.erase(this->outputBuffer.begin());
         }
 
+        this->canSend = false;
         this->queueDelayTick = -1;
         this->lastSuccessfulRTSTick = 0;
         this->outQueueCount = 0;
+        this->expCounter = 1;
+    }
+    else if( this->sentRTS && backoffCounter == 0) {
+        backoffCounter = rand() % 2u << expCounter;
+        if(expCounter < 10)
+            expCounter++;
+        sentRTS = false;
     }
     else if( this->backoffCounter == 0 ){
-        if( this->queueDelayTick < 0 && this->queueDelayTick < tick ) {
+        if( this->outputBuffer.size() - this->outQueueCount > 0 &&
+                (this->queueDelayTick < 0 || this->queueDelayTick < tick) ) {
             std::set<unsigned short> tempset;
 
             // Union all recipients of the buffer
@@ -138,7 +148,13 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
                         std::inserter(tempset, tempset.begin())
                 );
 
-            this->emitRTS(this->uniqueID, tempset);
+            std::set<unsigned short> tempset2;
+
+            for(auto itr = tempset.begin(); itr != tempset.end(); itr++)
+                tempset2.insert(routingTable[*itr]->uniqueID);
+
+            std::cout << "EMITTING RTS FROM NODE: " << uniqueID << std::endl;
+            this->emitRTS(this->uniqueID, tempset2, tick);
         }
     }
     else{
@@ -146,6 +162,7 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
     }
 
     this->lastTickActed = tick;
+    this->queueCount = 0;
 }
 
 void Node::emitCTS(unsigned short sourceID, const unsigned int &tick) {
@@ -153,41 +170,42 @@ void Node::emitCTS(unsigned short sourceID, const unsigned int &tick) {
     for(auto &n : neighbors) {
         n->receiveCTS(sourceID, tick);
     }
+    backoffCounter++;
 }
 
-void Node::emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID) {
+void Node::emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick) {
     //call receive rts on all neighbors
     for(auto &n : neighbors) {
-        n->receiveRTS(sourceID, destinationID);
+        n->receiveRTS(sourceID, destinationID, tick);
     }
+    sentRTS = true;
+    backoffCounter++;
 }
 
 void Node::receiveCTS(unsigned short rstSourceID, const unsigned int &tick) {
     if(rstSourceID == uniqueID) {
         canSend = true;
         lastSuccessfulRTSTick = tick -1;
+        sentRTS = false;
     }
     else {
         backoffCounter++;
     }
 }
 
-void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID) {
+void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick) {
     if(!collision) {
-        if(sourceIDRTS == 0) {
+        if(sourceIDRTS == 0 && !sentRTS) {
             if(destinationID.find(uniqueID) != destinationID.end()) {
                 sourceIDRTS = sourceID;
             }
-            else {
-                backoffCounter = rand() % 2u << expCounter;
-                if(expCounter < 10)
-                    expCounter++;
-            }
+            if(this->lastTickActed < tick)
+                this->backoffCounter++;
         }
-    }
-    else {
-        collision = true;
-        sourceIDRTS = 0;
+        else {
+            collision = true;
+            sourceIDRTS = 0;
+        }
     }
 }
 
@@ -277,8 +295,6 @@ void Node::buildRoutes() {
         //int dist = std::get<1>(tempT); //distance
         routingTable.insert({x.first->uniqueID, std::get<2>(tempT)});
     }
-
-    this->printRoutingTable();
 }
 
 //BFS to find all the nodes in the network
