@@ -27,11 +27,11 @@ private:
     bool collision = false;
     unsigned short sourceIDRTS = 0;
     unsigned short sourceIDCTS = 0;
-    unsigned int backoffCounter;
-    uint8_t expCounter;
+    unsigned int backoffCounter = 0;
+    uint8_t expCounter = 0;
     bool canSend = false;
-    unsigned int outQueueCount;
-    unsigned int lastSuccessfulRTSTick;
+    unsigned int outQueueCount = 0;
+    unsigned int lastSuccessfulRTSTick = 0;
     int queueDelayTick = 0;
     int alternateDelayTick = 0;
 
@@ -52,7 +52,7 @@ private:
     void sendPacket(const Packet & packet, const unsigned int &tick);
     void emitCTS(unsigned short sourceID, const unsigned int & tick);
     void emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID);
-    std::vector<Node*> buildTopology(); // fills allNodes to create topology of network
+    std::set<Node*> buildTopology(); // fills allNodes to create topology of network
 
 public:
     Node();

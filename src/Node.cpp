@@ -194,28 +194,28 @@ void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinat
 //written by Eric Smith
 //Dijkstra's Algorithm
 void Node::buildRoutes() {
-    std::vector<Node*> allNodes = buildTopology();
+    std::set<Node*> allNodes = buildTopology();
 
     std::unordered_map<Node*, std::tuple<unsigned short, unsigned int, Node*> >initialRouting;
 
     //initialize routingTable
-    for(int i=0;i<allNodes.size();i++) {
+    for(auto itr = allNodes.begin(); itr != allNodes.end(); itr++) {
         //destination, # hops, 1st hop
-        std::tuple<unsigned short, unsigned int, Node*> tempTuple(allNodes[i]->uniqueID, UINT_MAX, allNodes[i]);
-        initialRouting.insert({allNodes[i],tempTuple});
+        std::tuple<unsigned short, unsigned int, Node*> tempTuple((*itr)->uniqueID, UINT_MAX, *itr);
+        initialRouting.insert({*itr,tempTuple});
     }
 
     initialRouting.at(this) = std::make_tuple(this->uniqueID, 0, this); //set this as root node
 
-    std::vector<Node*> pathKnown; //list of nodes whose least cost path is known
-    pathKnown.push_back(this);
+    std::set<Node*> pathKnown; //list of nodes whose least cost path is known
+    pathKnown.insert(this);
 
     //for all nodes adjacent to root (this), set their distances to 1
-    for(int i=0;i<allNodes.size();i++){
-        Node* v = allNodes[i];
+    for(auto itr = allNodes.begin(); itr != allNodes.end(); itr++){
+        Node* v = *itr;
 
         //current node is adjacent to root (this)
-        if( std::find(this->neighbors.begin(), this->neighbors.end(), v) != this->neighbors.end() )
+        if( this->neighbors.find(v) != this->neighbors.end() )
             initialRouting.at(v) = std::make_tuple(v->uniqueID, 1, v);
     }
 
@@ -225,31 +225,31 @@ void Node::buildRoutes() {
         unsigned int leastCost = UINT_MAX;
 
         //find a node not in pathKnown with the minimum current cost
-        for(int i=0;i<allNodes.size();i++){
-            std::tuple<unsigned short, unsigned int, Node*> tempTuple = initialRouting.at( allNodes[i] );
+        for(auto itr = allNodes.begin(); itr != allNodes.end(); itr++){
+            std::tuple<unsigned short, unsigned int, Node*> tempTuple = initialRouting.at( *itr );
             unsigned int curValue = std::get<1>(tempTuple);
 
-            if( (std::find(pathKnown.begin(), pathKnown.end(), allNodes[i]) == pathKnown.end()) && curValue < leastCost ){
-                w = allNodes[i];
+            if( pathKnown.find(*itr) == pathKnown.end() && curValue < leastCost ){
+                w = *itr;
                 leastCost = curValue;
             }
         }
 
         //add w to list of known shortest paths
-        pathKnown.push_back(w);
+        pathKnown.insert(w);
 
         //update cost of path for all v adjacent to w and not in pathKnown
         for(auto itr = w->neighbors.begin(); itr != w->neighbors.end(); itr++){
             Node* v = *itr;
 
-            if( std::find(pathKnown.begin(), pathKnown.end(), v) == pathKnown.end() ){
-                std::tuple<unsigned short, int, Node*> vTuple = initialRouting.at(v);
-                int vDist = std::get<1>(vTuple);
+            if( pathKnown.find(v) == pathKnown.end() ){
+                std::tuple<unsigned short, unsigned int, Node*> vTuple = initialRouting.at(v);
+                unsigned int vDist = std::get<1>(vTuple);
 
-                std::tuple<unsigned short, int, Node*> wTuple = initialRouting.at(w);
-                int wDist = std::get<1>(wTuple);
+                std::tuple<unsigned short, unsigned int, Node*> wTuple = initialRouting.at(w);
+                unsigned int wDist = std::get<1>(wTuple);
 
-                int minDist = std::min(vDist, (wDist + 1));
+                unsigned int minDist = std::min(vDist, (wDist + 1));
 
                 Node* firstHop = std::get<2>(vTuple);
 
@@ -258,8 +258,8 @@ void Node::buildRoutes() {
                 if( (wDist + 1) < vDist ){
 
                     Node* targetFirstHop = w;
-                    while( std::find(this->neighbors.begin(), this->neighbors.end(), targetFirstHop) == this->neighbors.end() ){
-                        std::tuple<unsigned short, int, Node*> target = initialRouting.at(targetFirstHop);
+                    while( this->neighbors.find(targetFirstHop) == this->neighbors.end() ){
+                        std::tuple<unsigned short, unsigned int, Node*> target = initialRouting.at(targetFirstHop);
                         targetFirstHop = std::get<2>(target);
                     }
 
@@ -278,27 +278,23 @@ void Node::buildRoutes() {
         routingTable.insert({x.first->uniqueID, std::get<2>(tempT)});
     }
 
-
+    this->printRoutingTable();
 }
 
 //BFS to find all the nodes in the network
-std::vector<Node*> Node::buildTopology(){
+std::set<Node*> Node::buildTopology(){
     std::queue<Node*> frontier;
 
-    std::vector<Node*> allNodes;
+    std::set<Node*> allNodes;
 
     //mark root visited
-    allNodes.push_back(this);
+    allNodes.insert(this);
     frontier.push(this);
 
     while( !frontier.empty() ){
         for(auto &n : frontier.front()->neighbors ){
-            //allNodes doesn't contain nPrime (nPrime hasn't been visited)
-            if(std::find(allNodes.begin(), allNodes.end(), n) == allNodes.end()){
+            if(allNodes.insert(n).second){
                 frontier.push(n);
-
-                //mark nPrime visited
-                allNodes.push_back(n);
             }
         }
         frontier.pop();
