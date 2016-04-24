@@ -3,6 +3,7 @@
 //
 #include <algorithm>
 #include <climits>
+#include <stack>
 
 #include "Node.hpp"
 #include "Simulator.hpp"
@@ -18,14 +19,20 @@ void Node::sendPacket(const Packet & packet, const int &tick) {
 }
 
 //written by Eric Smith
+//Dijkstra's Algorithm
 void Node::buildRoutes() {
     buildTopology();
 
-    //initialize routingTable
-    for(int i=0;i<allNodes.size();i++)
-        routingTable.insert({allNodes.at(i), ULONG_MAX});
+    std::unordered_map<Node*, std::tuple<unsigned short, int, Node*> >initialRouting;
 
-    routingTable.at(this) = 0; //set this as root node
+    //initialize routingTable
+    for(int i=0;i<allNodes.size();i++) {
+        //destination, # hops, 1st hop
+        std::tuple<unsigned short, int, Node*> tempTuple(allNodes.at(i)->getUniqueID(), USHRT_MAX, allNodes.at(i));
+        initialRouting.insert({allNodes.at(i),tempTuple});
+    }
+
+    initialRouting.at(this) = std::make_tuple(this->getUniqueID(), 0, this); //set this as root node
 
     std::vector<Node*> pathKnown; //list of nodes whose least cost path is known
     pathKnown.push_back(this);
@@ -36,17 +43,18 @@ void Node::buildRoutes() {
 
         //current node is adjacent to root (this)
         if( std::find(this->getNeighbors().begin(), this->getNeighbors().end(), v) != this->getNeighbors().end() )
-            routingTable.at(v) = 1;
+            initialRouting.at(v) = std::make_tuple(v->getUniqueID(), 1, v);
     }
 
     //loop until all least cost paths are known
     while( pathKnown.size() != allNodes.size() ){
         Node* w;
-        unsigned int leastCost = ULONG_MAX;
+        unsigned int leastCost = USHRT_MAX;
 
         //find a node not in pathKnown with the minimum current cost
         for(int i=0;i<allNodes.size();i++){
-            int curValue = routingTable.at( allNodes.at(i) );
+            std::tuple<unsigned short, int, Node*> tempTuple = initialRouting.at( allNodes.at(i) );
+            int curValue = std::get<1>(tempTuple);
 
             if( (std::find(pathKnown.begin(), pathKnown.end(), allNodes.at(i)) == pathKnown.end()) && curValue < leastCost ){
                 w = allNodes.at(i);
@@ -62,35 +70,66 @@ void Node::buildRoutes() {
             Node* v = w->getNeighbors().at(i);
 
             if( std::find(pathKnown.begin(), pathKnown.end(), v) == pathKnown.end() ){
-                routingTable.at(v) = std::min(routingTable.at(v), (routingTable.at(w) + 1));
+                std::tuple<unsigned short, int, Node*> vTuple = initialRouting.at(v);
+                int vDist = std::get<1>(vTuple);
+
+                std::tuple<unsigned short, int, Node*> wTuple = initialRouting.at(w);
+                int wDist = std::get<1>(wTuple);
+
+                int minDist = std::min(vDist, (wDist + 1));
+
+                Node* firstHop = std::get<2>(vTuple);
+
+                //if this node is beyond depth 1, go back through nodes until firstHop is found
+                //firstHop is a neighbor of the root (this)
+                if( (wDist + 1) < vDist ){
+
+                    Node* targetFirstHop = w;
+                    while( std::find(this->getNeighbors().begin(), this->getNeighbors().end(), targetFirstHop) == this->getNeighbors().end() ){
+                        std::tuple<unsigned short, int, Node*> target = initialRouting.at(targetFirstHop);
+                        targetFirstHop = std::get<2>(target);
+                    }
+
+                    firstHop = targetFirstHop;
+                }
+
+                initialRouting.at(v) = std::make_tuple(std::get<0>(vTuple), minDist, firstHop);
             }
         }
     }
+
+    //populate routingTable
+    for(auto& x : initialRouting ){
+        std::tuple<unsigned short, int, Node*> tempT = x.second;
+        //int dist = std::get<1>(tempT); //distance
+        routingTable.insert({x.first->getUniqueID(), std::get<2>(tempT)});
+    }
+
 
 }
 
 //BFS to find all the nodes in the network
 void Node::buildTopology(){
-    Queue<Node*> frontier;
+
+    std::queue<Node*> frontier;
 
     //mark root visited
     allNodes.push_back(this);
     frontier.push(this);
 
-    while( !frontier.getQueue().empty() ){
-        Node* n = frontier.pop();
-
-        for(int i=0;i<n->getNeighbors().size();i++){
-            Node* nPrime = n->getNeighbors().at(i);
+    while( !frontier.empty() ){
+        for(auto &n : frontier.front()->getNeighbors() ){
 
             //allNodes doesn't contain nPrime (nPrime hasn't been visited)
-            if(std::find(allNodes.begin(), allNodes.end(), nPrime) == allNodes.end()){
-                frontier.push(nPrime);
+            if(std::find(allNodes.begin(), allNodes.end(), n) == allNodes.end()){
+                frontier.push(n);
 
                 //mark nPrime visited
-                allNodes.push_back(nPrime);
+                allNodes.push_back(n);
             }
         }
+
+        frontier.pop();
     }
 
 }
@@ -99,7 +138,7 @@ void Node::buildTopology(){
 // Needed to create vector<Node>
 Node::Node() { this->uniqueID = ++(Node::sequenceID); }
 
-Node::Node(unsigned int uniqueID) : uniqueID{uniqueID} { }
+Node::Node(unsigned short uniqueID) : uniqueID{uniqueID} { }
 
 void Node::setNeighbors(std::vector<Node *> &neighbors) {
     this->neighbors = neighbors;
@@ -109,7 +148,7 @@ std::vector<Node*> & Node::getNeighbors(){
     return this->neighbors;
 }
 
-unsigned int Node::getUniqueID(){
+unsigned short Node::getUniqueID(){
     return this->uniqueID;
 }
 
@@ -162,13 +201,14 @@ Packet* Node::processorAction() {
 
 void Node::printRoutingTable(){
     std::cout << " ---- Routing Table ----" << std::endl;
-    std::cout << "| Unique ID | Distance |" << std::endl;
+    std::cout << "| Dest ID | First Hop |" << std::endl;
     std::cout << "------------------------" << std::endl;
     for(auto& x: routingTable){
-        if(x.first == this)
-            std::cout << "root" << " | " << x.second << std::endl;
+        if(x.first == this->getUniqueID())
+            std::cout << "  " << "root" << "\t|\t" << x.second->getUniqueID() << std::endl;
         else
-            std::cout << x.first->getUniqueID() << " | " << x.second << std::endl;
+            std::cout << "  " << x.first << "\t\t|\t" << x.second->getUniqueID() << std::endl;
     }
     std::cout << "------------------------" << std::endl;
+
 }

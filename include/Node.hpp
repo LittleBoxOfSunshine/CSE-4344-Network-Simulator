@@ -19,14 +19,14 @@ private:
     //const static unordered_map<unsigned short, std::vector<unsigned int>> GROUP_TABLE;
 
     static unsigned int sequenceID;
-    unsigned int uniqueID;
+    unsigned short uniqueID;
     unsigned short groupID;
     std::vector<Node*> neighbors; //constant weight of 1 from each node to the next
     std::vector<Node*> allNodes; //list of all nodes in the network for Dijkstra's
     std::vector<Packet> packetCache;
     std::queue<Packet> inputBuffer;
     std::priority_queue<Packet> outputBuffer;
-    std::unordered_map<Node*, unsigned int> routingTable;
+    std::unordered_map<unsigned short, Node*> routingTable; //key: destination ID, value: first hop to destination
     bool receivedCTS;
     bool receivedRTS;
 
@@ -49,10 +49,10 @@ private:
 
 public:
     Node();
-    Node(unsigned int uniqueID);
+    Node(unsigned short uniqueID);
     void setNeighbors(std::vector<Node*> & neighbors);
     std::vector<Node*> & getNeighbors();
-    unsigned int getUniqueID();
+    unsigned short getUniqueID();
     void receivePacket(const Packet & packet, const int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p); // Called by simulator when a packet is "created" for the node to send
     void slotAction(const int & tick, std::queue<Packet> & transmittedPackets);
