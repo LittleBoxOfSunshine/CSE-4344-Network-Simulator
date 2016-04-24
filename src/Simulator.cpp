@@ -27,18 +27,18 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets)
 }
 
 Simulator::~Simulator(){
-    Simulator::simulating = false;
-    simulatorThread.join();
+    delete[] this->nodes;
     out.close();
 }
 
 //print to file if Simulator queue isn't empty
 //elsewise sleep for user defined time
 void Simulator::handler() {
-    while(Simulator::simulating) {
+    std::cout << "start output thread" << std::endl;
+    while(Simulator::simulating || !queue.getQueue().empty()) {
         if (!queue.getQueue().empty()) {
             //print to file
-            out << queue.pop() << "\n";
+            std::cout << queue.pop() << "\n";
         }
         else {
             sleep(sleepTime);
@@ -82,17 +82,15 @@ void Simulator::start() {
     while (this->numDestinations > 0){
         this->runTick();
         Packet transmitted;
-        bool queueEmpty = false;
-        while(!queueEmpty){
+        while(!transmittedPackets.empty()){
             transmitted = transmittedPackets.front();
             transmittedPackets.pop();
-            if(transmittedPackets.empty()){
-                queueEmpty = true;
-            }
             numDestinations--;
             std::string packetMessage = "Packet #" + std::to_string(transmitted.getUniqueID()) + " has reached a destination.";
             this->log(packetMessage);
         }
     }
-    this->simulating=false;
+    sleep(Simulator::sleepTime*2);
+    Simulator::simulating = false;
+    simulatorThread.join();
 }

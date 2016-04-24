@@ -29,7 +29,7 @@ private:
     int nodeCount;
     unsigned int currentTick;
     std::vector<Packet> unaddedPackets; // Must be presorted
-    int packetIndex;
+    int packetIndex = 0;
 
     void runTick(); // Packets that finish transmitting during this tick will be added to Simulator::transmittedPackets
 

@@ -16,23 +16,22 @@
 /// Generate a random network with n nodes arranged in the star topology
 Node* starGen(int numNodes) {
     Node* nodes = new Node[numNodes];
-    Node center = nodes[0];
+    std::set<Node*> leafNeighbor{nodes};
+    std::set<Node*> leaves;
     for(int i=1;i<numNodes;i++) {
-        Node leaf = nodes[i];
-        std::set<Node*> leafNeighbor;
-        leafNeighbor.insert(&center);
-        leaf.setNeighbors(leafNeighbor);
+        nodes[i].setNeighbors(leafNeighbor);
+        leaves.insert(&nodes[i]);
     }
-    std::set<Node*> leaves(&nodes+1,&nodes+numNodes);
-    center.setNeighbors(leaves);
+    nodes[0].setNeighbors(leaves);
     return nodes;
 }
 
 /// Generate a random network with n nodes arranged in the grid topology
 Node* gridGen(int numNodes, int numColumns) {
     Node* nodes = new Node[numNodes];
+    std::set<Node*> neighbors;
     for(int i=0;i<numNodes;i++){
-        std::set<Node*> neighbors;
+        neighbors.clear();
         if(i - numColumns >= 0){
             neighbors.insert(&nodes[i-numColumns]);
         }
@@ -62,6 +61,13 @@ Node* meshGen(int numNodes, std::vector<std::vector<std::string>>& neighborList)
             neighbors.insert(&nodes[std::stoi(neighborList[i][j])]);
         }
         nodes[i].setNeighbors(neighbors);
+    }
+    for(int i = 0;i < numNodes; i++) {
+        std::cout << nodes[i].uniqueID << ": ";
+        for(auto itr = nodes[i].neighbors.begin(); itr != nodes[i].neighbors.end(); itr++) {
+            std::cout << (*itr)->uniqueID << " ";
+        }
+        std::cout << std::endl;
     }
     return nodes;
 

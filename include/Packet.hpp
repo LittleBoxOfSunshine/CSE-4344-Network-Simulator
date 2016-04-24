@@ -21,7 +21,7 @@ private:
 public:
 
     Packet();
-    Packet(unsigned int uniqueID, unsigned short source, unsigned short destination, unsigned int creationTick,
+    Packet(unsigned int uniqueID, unsigned short source, std::set<unsigned short> destination, unsigned int creationTick,
            bool highPriority=false);
 
     unsigned int getUniqueID();

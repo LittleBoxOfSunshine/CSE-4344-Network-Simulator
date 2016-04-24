@@ -36,8 +36,8 @@ private:
     int alternateDelayTick = 0;
 
     static unsigned short sequenceID;
-    unsigned short uniqueID;
-    std::set<Node*> neighbors;
+//    unsigned short uniqueID;
+//    std::set<Node*> neighbors;
     std::queue<Packet> inputBuffer;
     std::vector<Packet> outputBuffer;
     std::unordered_map<unsigned short, Node*> routingTable;
@@ -58,6 +58,8 @@ public:
     Node();
     Node(unsigned short uniqueID);
 
+    unsigned short uniqueID;
+    std::set<Node*> neighbors;
     void setNeighbors(std::set<Node*> & neighbors);
     void receivePacket(const Packet & packet, const unsigned int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p, const unsigned int & tick); // Called by simulator when a packet is "created" for the node to send

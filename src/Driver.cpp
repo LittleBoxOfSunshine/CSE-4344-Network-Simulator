@@ -18,9 +18,7 @@ int main( int argc, char * argv[] ) {
     // Check that required command line args were supplied
     if( argc == 3 ){
         // Load config
-        std::string configPath(getenv("HOME"));
-        configPath += "/ClionProjects/simulator/configs/";
-        configPath += argv[1];
+        std::string configPath = argv[1];
         std::ifstream configFile;
         configFile.open(configPath, std::ios::in);
 
@@ -64,9 +62,7 @@ int main( int argc, char * argv[] ) {
 
         // Load messages
         //std::ifstream messageFile(argv[1], std::ios::in);
-        std::string messagePath(getenv("HOME"));
-        messagePath += "/ClionProjects/simulator/configs/";
-        messagePath += argv[2];
+        std::string messagePath = argv[2];
         std::ifstream messageFile;
         messageFile.open(messagePath, std::ios::in);
 
@@ -76,7 +72,7 @@ int main( int argc, char * argv[] ) {
         unsigned short id = 1;
         while(getline(messageFile, line)) {
             unsigned short source;
-            std::vector<unsigned short> destinations;
+            std::set<unsigned short> destinations;
             unsigned int tick;
             bool priority;
 
@@ -88,18 +84,16 @@ int main( int argc, char * argv[] ) {
             unsigned short temp;
             while(stream.peek() != ']') {
                 stream >> temp;
-                destinations.push_back(temp);
+                destinations.insert(temp);
             }
             stream.ignore();        //ignore space
             stream >> tick;
             stream.ignore();
             stream >> priorityInput;
             priority = (bool) priorityInput;
+            packets.push_back(Packet(id, source, destinations, tick, priority));
+            id++;
 
-            for(int i = 0; i < destinations.size(); i++) {
-                packets.push_back(Packet(id, source, destinations[i], tick, priority));
-                id++;
-            }
 
         }
 

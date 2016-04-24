@@ -9,7 +9,7 @@ Packet::Packet() {
     this->highPriority = false;
 }
 
-Packet::Packet(unsigned int uniqueID, unsigned short source, unsigned short destination, unsigned int creationTick,
+Packet::Packet(unsigned int uniqueID, unsigned short source, std::set<unsigned short> destination, unsigned int creationTick,
                bool highPriority)
         : uniqueID{uniqueID}
         , source{source}
