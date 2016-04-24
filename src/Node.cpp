@@ -45,13 +45,29 @@ void Node::setNeighbors(std::set<Node *> &neighbors) {
 }
 
 void Node::receivePacket(const Packet &packet, const unsigned int &tick) {
-    if (packet.isHighPriority()) {
-        if (this->queueDelayTick < 0 || this->queueDelayTick > tick)
-            this->queueDelayTick = tick;
+    this->inputBuffer.push(packet);
+
+    if(this->lastTickActed < tick) {
+        this->queueCount++;
+
+        if (packet.isHighPriority()) {
+            if (this->alternateDelayTick < 0 || this->alternateDelayTick > tick)
+                this->alternateDelayTick = tick;
+        }
+        else {
+            if (this->alternateDelayTick < 0 || this->alternateDelayTick > tick + Node::MAX_DELAY_FOR_LOW_PRIORITY)
+                this->alternateDelayTick = tick + Node::MAX_DELAY_FOR_LOW_PRIORITY;
+        }
     }
-    else {
-        if (this->queueDelayTick < 0 || this->queueDelayTick > tick + Node::MAX_DELAY_FOR_LOW_PRIORITY)
-            this->queueDelayTick = tick + Node::MAX_DELAY_FOR_LOW_PRIORITY;
+    else{
+        if(packet.isHighPriority()) {
+            if( this->queueDelayTick < 0 || this->queueDelayTick > tick)
+                this->queueDelayTick = tick;
+        }
+        else{
+            if( this->queueDelayTick < 0 || this->queueDelayTick > tick + Node::MAX_DELAY_FOR_LOW_PRIORITY)
+                this->queueDelayTick = tick + Node::MAX_DELAY_FOR_LOW_PRIORITY;
+        }
     }
 }
 
@@ -84,6 +100,12 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
 
         if(temp.getDestination().size() > 0)
             this->queuePacket(temp, tick);
+    }
+
+    // Apply alternate tick if needed
+    if(this->alternateDelayTick >= 0) {
+        this->queueDelayTick = this->alternateDelayTick;
+        this->alternateDelayTick = -1;
     }
 
     ////////////////// SEND + SCHEDULE //////////////////

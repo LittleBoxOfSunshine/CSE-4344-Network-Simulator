@@ -33,6 +33,7 @@ private:
     unsigned int outQueueCount;
     unsigned int lastSuccessfulRTSTick;
     int queueDelayTick = 0;
+    int alternateDelayTick = 0;
 
     static unsigned short sequenceID;
     unsigned short uniqueID;

@@ -42,7 +42,7 @@ int main( int argc, char * argv[] ) {
             nodes = starGen(numNodes);
         }
         else if(topologyType.compare("Mesh") == 0) {
-            std::vector<std::vector<std::string>> neighbors(numNodes+1);    //vector for neighbors; ID used as index
+            std::vector<std::vector<std::string>> neighbors(numNodes+1u);    //vector for neighbors; ID used as index
             for(int i = 1; i < numNodes+1; i++) {
                 std::string buffer;
                 int nodeid;             //gets id for node
@@ -52,7 +52,7 @@ int main( int argc, char * argv[] ) {
                 std::stringstream stream(buffer);
                 std::string temp;
                 while(stream >> temp) {         //parse whole line and push to vector
-                    neighbors.at(nodeid).push_back(temp);
+                    neighbors[nodeid].push_back(temp);
                 }
             }
             //CREATE TOPOLOGY HERE
@@ -73,11 +73,11 @@ int main( int argc, char * argv[] ) {
         std::vector<Packet> packets;
 
         std::string line;
-        int id = 1;
+        unsigned short id = 1;
         while(getline(messageFile, line)) {
-            int source;
-            std::vector<int> destinations;
-            int tick;
+            unsigned short source;
+            std::vector<unsigned short> destinations;
+            unsigned int tick;
             bool priority;
 
             int priorityInput;
@@ -85,8 +85,8 @@ int main( int argc, char * argv[] ) {
             stream >> source;
             stream.ignore();        //ignore space
             stream.ignore();        //ignore '['
+            unsigned short temp;
             while(stream.peek() != ']') {
-                int temp;
                 stream >> temp;
                 destinations.push_back(temp);
             }
@@ -97,7 +97,7 @@ int main( int argc, char * argv[] ) {
             priority = (bool) priorityInput;
 
             for(int i = 0; i < destinations.size(); i++) {
-                packets.push_back(Packet(id, source, destinations.at(i), tick, priority));
+                packets.push_back(Packet(id, source, destinations[i], tick, priority));
                 id++;
             }
 
