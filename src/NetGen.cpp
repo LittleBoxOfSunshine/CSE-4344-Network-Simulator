@@ -51,18 +51,16 @@ Node* gridGen(int numNodes, int numColumns) {
 
 /// Generate a random network with n nodes arranged in the mesh topology
 Node* meshGen(int numNodes, std::vector<std::vector<std::string>>& neighborList) {
-    Node* nodes= new Node[numNodes];
-    /*for(int i = 1; i < numNodes+1; i++) {     //create nodes with messages and tick time
-        nodes.at(i) = new Node(i);
-    }*/
+    Node* nodes = new Node[numNodes];
+    std::set<Node*> neighbors;
     for(int i = 0; i < neighborList.size(); i++) {
-        std::set<Node*> neighbors;
+        neighbors.clear();
         for(int j = 0; j < neighborList[i].size(); j++) {
-            neighbors.insert(&nodes[std::stoi(neighborList[i][j])]);
+            neighbors.insert(&nodes[std::stoi(neighborList[i][j])-1]);
         }
         nodes[i].setNeighbors(neighbors);
     }
-    for(int i = 0;i < numNodes; i++) {
+    for(int i = 0; i < numNodes; i++) {
         std::cout << nodes[i].uniqueID << ": ";
         for(auto itr = nodes[i].neighbors.begin(); itr != nodes[i].neighbors.end(); itr++) {
             std::cout << (*itr)->uniqueID << " ";

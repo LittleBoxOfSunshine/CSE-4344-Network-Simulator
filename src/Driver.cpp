@@ -40,8 +40,8 @@ int main( int argc, char * argv[] ) {
             nodes = starGen(numNodes);
         }
         else if(topologyType.compare("Mesh") == 0) {
-            std::vector<std::vector<std::string>> neighbors(numNodes+1u);    //vector for neighbors; ID used as index
-            for(int i = 1; i < numNodes+1; i++) {
+            std::vector<std::vector<std::string>> neighbors(numNodes);    //vector for neighbors; ID used as index
+            for(int i = 0; i < numNodes; i++) {
                 std::string buffer;
                 int nodeid;             //gets id for node
                 configFile >> nodeid;
@@ -50,7 +50,7 @@ int main( int argc, char * argv[] ) {
                 std::stringstream stream(buffer);
                 std::string temp;
                 while(stream >> temp) {         //parse whole line and push to vector
-                    neighbors[nodeid].push_back(temp);
+                    neighbors[nodeid-1].push_back(temp);
                 }
             }
             //CREATE TOPOLOGY HERE
