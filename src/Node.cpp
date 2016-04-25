@@ -10,6 +10,10 @@
 
 unsigned short Node::sequenceID = 0;
 
+unsigned int Node::countCTS = 0;
+
+unsigned int Node::countRTS = 0;
+
 void Node::sendPacket(const Packet & packet, const unsigned int &tick) {
     if( packet.getDestination().size() == 1){
         this->routingTable[*packet.getDestination().begin()]->receivePacket(packet, tick);
