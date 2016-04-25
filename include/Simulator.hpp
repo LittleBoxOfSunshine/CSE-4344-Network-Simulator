@@ -25,7 +25,7 @@ private:
     unsigned int numDestinations = 0;
     std::ofstream out;
     Queue<std::string> queue;
-
+    std::string logString;
     Node* nodes;
     int nodeCount;
     unsigned int currentTick;

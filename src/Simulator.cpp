@@ -25,7 +25,7 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets,s
     std::string path(getenv("HOME"));
 //    path += "/log.csv";
     out.open(logFilePath,std::ofstream::app);
-
+    logString = "";
     //start thread and store it
     //simulatorThread = std::thread(&Simulator::handler, this);
 }
@@ -51,9 +51,9 @@ void Simulator::handler() {
 }
 
 //write string to log.csv
-void Simulator::log(std::string logString){
+void Simulator::log(std::string logStringAppend){
     //queue.push(logString);
-    this->out << logString;
+    logString += logStringAppend;
 }
 
 //write vector to log.csv, separating values with comma
@@ -151,5 +151,6 @@ void Simulator::start(bool networkCoding) {
     sleep(Simulator::sleepTime*2);
     SIMULTATING = false;
     //simulatorThread.join();
+    this->out << logString;
     std::cout << "Simulation completed in " << this->currentTick << " ticks" << std::endl;
 }
