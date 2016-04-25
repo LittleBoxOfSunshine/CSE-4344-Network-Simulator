@@ -73,7 +73,7 @@ public:
     void receivePacket(const Packet & packet, const unsigned int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p, const unsigned int & tick); // Called by simulator when a packet is "created" for the node to send
     void slotAction(const unsigned int & tick, std::queue<std::pair<unsigned short,Packet>> & transmittedPackets);
-
+    unsigned short getUniqueID();
     // Called by simulator to run the node's actions during the current time slot (tick)
     void receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick);
     void receiveCTS(unsigned short rstSourceID, const unsigned int & tick);

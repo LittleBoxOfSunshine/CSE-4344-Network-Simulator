@@ -10,7 +10,7 @@ bool Node::NETWORK_CODING = true;
 
 bool SIMULTATING = false;
 
-Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets)
+Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets,std::string logFilePath)
         : nodes{nodes}
         , nodeCount{nodeCount}
         , unaddedPackets{packets}
@@ -21,8 +21,8 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets)
     std::cout << this->numDestinations << " <- numDestinations" << std::endl;
     //create file at location specified in home dir
     std::string path(getenv("HOME"));
-    path += "/log.csv";
-    out.open(path);
+//    path += "/log.csv";
+    out.open(logFilePath);
 
     //start thread and store it
     //simulatorThread = std::thread(&Simulator::handler, this);
@@ -90,8 +90,13 @@ void Simulator::start(bool networkCoding) {
     if(!networkCoding) {
         Node::MAX_DELAY_FOR_LOW_PRIORITY = 0;
         Node::NETWORK_CODING = false;
+        this->log("Starting simulator without network coding.\n");
+    }
+    else{
+        this->log("Staring simulator with network coding.\n");
     }
 
+    this->log("----------------\n");
     SIMULTATING = true;
 
     // Build routing tables on all nodes
@@ -137,6 +142,9 @@ void Simulator::start(bool networkCoding) {
     {
         //this->log("Node #"+std::to_string(nodes[i].getUniqueID())+" sent "+std::to_string(nodes[i].getNumPacketsSent())+" total messages.\n");
     }
+    this->log("----------------\n");
+    this->log("End of simulator.\n");
+    this->log("----------------\n");
     sleep(Simulator::sleepTime*2);
     SIMULTATING = false;
     //simulatorThread.join();
