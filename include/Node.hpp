@@ -59,7 +59,7 @@ private:
 public:
     static int MAX_DELAY_FOR_LOW_PRIORITY;
     static bool NETWORK_CODING;
-
+    //Counterers for CTS and RTS
     unsigned int countRTS = 0;
     unsigned int countCTS = 0;
     unsigned int numSends = 0;//number of sends for specific node

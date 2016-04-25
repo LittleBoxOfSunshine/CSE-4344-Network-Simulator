@@ -124,7 +124,6 @@ void Simulator::start(bool networkCoding) {
             this->log(packetMessage);
         }
     }
-    for(int i = 0; i < nodeCount)
     this->log("----------------\n");
     this->log("Total number of ticks: "+std::to_string(this->currentTick)+"\n");
     this->log("----------------\n");
@@ -134,7 +133,6 @@ void Simulator::start(bool networkCoding) {
     this->log("----------------\n");
     this->log("Total number of RTS: "+std::to_string(this->RTS)+"\n");
     this->log("----------------\n");
-    std::cout<<this->CTS << std::endl;
     for(int i = 0; i < nodeCount; i++)
     {
         //this->log("Node #"+std::to_string(nodes[i].getUniqueID())+" sent "+std::to_string(nodes[i].getNumPacketsSent())+" total messages.\n");
