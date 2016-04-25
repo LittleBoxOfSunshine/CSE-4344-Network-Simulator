@@ -15,6 +15,8 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets,s
         , nodeCount{nodeCount}
         , unaddedPackets{packets}
 {
+    Node::countCTS = 0;
+    Node::countRTS = 0;
     for(int i = 0;i<packets.size();i++) {
         this->numDestinations+=packets[i].getDestination().size();
     }
@@ -22,7 +24,7 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets,s
     //create file at location specified in home dir
     std::string path(getenv("HOME"));
 //    path += "/log.csv";
-    out.open(logFilePath);
+    out.open(logFilePath,std::ofstream::app);
 
     //start thread and store it
     //simulatorThread = std::thread(&Simulator::handler, this);
@@ -50,7 +52,8 @@ void Simulator::handler() {
 
 //write string to log.csv
 void Simulator::log(std::string logString){
-    queue.push(logString);
+    //queue.push(logString);
+    this->out << logString;
 }
 
 //write vector to log.csv, separating values with comma
