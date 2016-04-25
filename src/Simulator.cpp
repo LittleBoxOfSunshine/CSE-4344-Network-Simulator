@@ -116,6 +116,7 @@ void Simulator::start(bool networkCoding) {
             this->log(packetMessage);
         }
     }
+    this->log(std::to_string(numTicksDataArrived));
     sleep(Simulator::sleepTime*2);
     Simulator::simulating = false;
     simulatorThread.join();
