@@ -25,6 +25,7 @@ private:
     const static int MAX_DELAY_FOR_LOW_PRIORITY = 10;
 
     bool collision = false;
+    unsigned int delayEmitCTS = 0;
     unsigned short sourceIDRTS = 0;
     unsigned short sourceIDCTS = 0;
     unsigned int backoffCounter = 0;
@@ -35,6 +36,7 @@ private:
     int queueDelayTick = 0;
     int alternateDelayTick = 0;
     bool sentRTS = false;
+    int lastTickCTSDelay = 0;
 
     static unsigned short sequenceID;
     unsigned short uniqueID;

@@ -110,21 +110,26 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
 
     ////////////////// SEND + SCHEDULE //////////////////
 
-    if( this->sourceIDRTS != 0 && backoffCounter == 0 ) {
+    if( this->sourceIDRTS != 0 && delayEmitCTS <= tick) {
+        std::cout << "EMITING CTS FROM NODE: " << uniqueID <<
+                " TO NODE: " << this->sourceIDRTS << " ON TICK: " << tick << std::endl;
         this->emitCTS(this->sourceIDRTS, tick);
         this->sourceIDRTS = 0;
     }
     else if( this->canSend ){
-        std::cout << "SENDING PACKET FROM NODE: " << uniqueID << std::endl;
+        std::cout << "SENDING PACKET FROM NODE: " << uniqueID << " ON TICK: " << tick << std::endl;
+
         while(this->outputBuffer.size() - this->outQueueCount > 0) {
             this->sendPacket(this->outputBuffer.front(), tick);
             this->outputBuffer.erase(this->outputBuffer.begin());
+            //this->outQueueCount -= 1;
         }
+
+        this->outQueueCount = 0;
 
         this->canSend = false;
         this->queueDelayTick = -1;
         this->lastSuccessfulRTSTick = 0;
-        this->outQueueCount = 0;
         this->expCounter = 1;
     }
     else if( this->sentRTS && backoffCounter == 0) {
@@ -153,7 +158,10 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
             for(auto itr = tempset.begin(); itr != tempset.end(); itr++)
                 tempset2.insert(routingTable[*itr]->uniqueID);
 
-            std::cout << "EMITTING RTS FROM NODE: " << uniqueID << std::endl;
+            std::cout << "EMITTING RTS FROM NODE: " << uniqueID << " TO NODE(s): ";
+            for(auto itr = tempset2.begin(); itr != tempset2.end(); itr++)
+                std::cout << *itr << " ";
+            std::cout << "ON TICK: " << tick << std::endl;
             this->emitRTS(this->uniqueID, tempset2, tick);
         }
     }
@@ -185,11 +193,12 @@ void Node::emitRTS(unsigned short sourceID, std::set<unsigned short> destination
 void Node::receiveCTS(unsigned short rstSourceID, const unsigned int &tick) {
     if(rstSourceID == uniqueID) {
         canSend = true;
-        lastSuccessfulRTSTick = tick -1;
+        lastSuccessfulRTSTick = tick - 1;
         sentRTS = false;
     }
-    else {
-        backoffCounter++;
+    else if(this->lastTickActed < tick && lastTickCTSDelay < tick) {
+        this->backoffCounter++;
+        this->lastTickCTSDelay = tick;
     }
 }
 
@@ -199,8 +208,9 @@ void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinat
             if(destinationID.find(uniqueID) != destinationID.end()) {
                 sourceIDRTS = sourceID;
             }
-            if(this->lastTickActed < tick)
-                this->backoffCounter++;
+            else if(this->lastTickActed < tick) {
+                delayEmitCTS = tick + 1;
+            }
         }
         else {
             collision = true;

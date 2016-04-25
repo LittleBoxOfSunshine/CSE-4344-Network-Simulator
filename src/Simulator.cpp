@@ -49,6 +49,7 @@ void Simulator::handler() {
 //write string to log.csv
 void Simulator::log(std::string logString){
     std::cout << logString << std::endl;
+    //queue.push(logString);
 }
 
 //write vector to log.csv, separating values with comma
@@ -89,10 +90,13 @@ void Simulator::start() {
     for (int i = 0; i < this->nodeCount; i++)
         this->nodes[i].buildRoutes();
 
-    while (this->numDestinations > 0){
-        std::cout << "Starting Tick " << this->currentTick << std::endl;
+    while (this->numDestinations > 0 ){
+        if(this->currentTick%50 == 0) {
+            std::cout << "Starting Tick " << this->currentTick << ", " << numDestinations <<
+                " Destinations Remain...";
+            std::cout << std::endl;
+        }
         this->runTick();
-        std::cout << "Processing Tick " << this->currentTick-1 << std::endl;
         Packet transmitted;
         while(!transmittedPackets.empty()){
             transmitted = transmittedPackets.front();
@@ -105,4 +109,5 @@ void Simulator::start() {
     sleep(Simulator::sleepTime*2);
     Simulator::simulating = false;
     simulatorThread.join();
+    std::cout << "Simulation completed in " << this->currentTick << " ticks" << std::endl;
 }
