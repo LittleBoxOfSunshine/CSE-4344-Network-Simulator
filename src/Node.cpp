@@ -87,7 +87,7 @@ void Node::queuePacket(const Packet &p, const unsigned int & tick) {
         this->outQueueCount++;
 }
 
-void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmittedPackets) {
+void Node::slotAction(const unsigned int &tick, std::queue<std::pair<unsigned short,Packet>> & transmittedPackets) {
     ////////////////// READ //////////////////
 
     Packet temp;
@@ -96,7 +96,7 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
         this->inputBuffer.pop();
 
         if(temp.findAndRemove(this->uniqueID))
-            transmittedPackets.push(temp);
+            transmittedPackets.push(std::pair<unsigned short,Packet>(this->uniqueID,temp));
 
         if(temp.getDestination().size() > 0)
             this->queuePacket(temp, tick);
