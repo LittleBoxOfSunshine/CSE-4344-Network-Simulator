@@ -120,7 +120,8 @@ void Simulator::start(bool networkCoding) {
             this->log(packetMessage);
         }
     }
-    this->log(std::to_string(numTicksDataArrived));
+    this->log("-----------------------------------\n");
+    this->log("Number of ticks during which a packet reached a destination: "+std::to_string(numTicksDataArrived)+"\n");
     sleep(Simulator::sleepTime*2);
     SIMULTATING = false;
     //simulatorThread.join();
