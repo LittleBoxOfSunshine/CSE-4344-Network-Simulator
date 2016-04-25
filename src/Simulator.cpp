@@ -105,15 +105,18 @@ void Simulator::start(bool networkCoding) {
         }
         this->runTick();
         Packet transmitted;
+        unsigned short destinationReached;
         if(!transmittedPackets.empty())
         {
             numTicksDataArrived++;
         }
         while(!transmittedPackets.empty()){
-            transmitted = transmittedPackets.front();
+            transmitted = transmittedPackets.front().second;
+            destinationReached = transmittedPackets.front().first;
             transmittedPackets.pop();
             this->numDestinations--;
-            std::string packetMessage = "Packet #" + std::to_string(transmitted.getUniqueID()) + " has reached destination node " + std::to_string(*(transmitted.getDestination().begin())) + " in " + std::to_string(this->currentTick - transmitted.getCreationTick()) + " ticks.";
+            std::string packetMessage = "Packet #" + std::to_string(transmitted.getUniqueID()) + " has reached destination node " + std::to_string(destinationReached) + " in " + std::to_string(this->currentTick - transmitted.getCreationTick()) + " ticks.\n";
+            //std::cout << packetMessage;
             this->log(packetMessage);
         }
     }
