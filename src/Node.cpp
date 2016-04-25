@@ -109,20 +109,24 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
     }
 
     ////////////////// SEND + SCHEDULE //////////////////
-
-    if( this->sourceIDRTS != 0 && delayEmitCTS <= tick) {
-        std::cout << "EMITING CTS FROM NODE: " << uniqueID <<
-                " TO NODE: " << this->sourceIDRTS << " ON TICK: " << tick << std::endl;
+    if( this->sourceIDRTS != 0 && collisionTick -1 < tick) {
+        // std::cout << "EMITING CTS FROM NODE: " << uniqueID << " TO NODE: " << this->sourceIDRTS << " ON TICK: " << tick << std::endl;
         this->emitCTS(this->sourceIDRTS, tick);
         this->sourceIDRTS = 0;
     }
     else if( this->canSend ){
-        std::cout << "SENDING PACKET FROM NODE: " << uniqueID << " ON TICK: " << tick << std::endl;
+        // std::cout << "SENDING PACKET FROM NODE: " << uniqueID << " ON TICK: " << tick << std::endl;
 
-        while(this->outputBuffer.size() - this->outQueueCount > 0) {
+        if(this->outputBuffer.size() - this->outQueueCount > 0) {
             this->sendPacket(this->outputBuffer.front(), tick);
             this->outputBuffer.erase(this->outputBuffer.begin());
-            //this->outQueueCount -= 1;
+        }
+
+        if(Node::NETWORK_CODING) {
+            while(this->outputBuffer.size() - this->outQueueCount > 0) {
+                this->sendPacket(this->outputBuffer.front(), tick);
+                this->outputBuffer.erase(this->outputBuffer.begin());
+            }
         }
 
         this->outQueueCount = 0;
@@ -158,10 +162,10 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
             for(auto itr = tempset.begin(); itr != tempset.end(); itr++)
                 tempset2.insert(routingTable[*itr]->uniqueID);
 
-            std::cout << "EMITTING RTS FROM NODE: " << uniqueID << " TO NODE(s): ";
-            for(auto itr = tempset2.begin(); itr != tempset2.end(); itr++)
-                std::cout << *itr << " ";
-            std::cout << "ON TICK: " << tick << std::endl;
+            //std::cout << "EMITING RTS FROM NODE: " << uniqueID << " TO NODE(s): ";
+            //for(auto itr = tempset2.begin(); itr != tempset2.end(); itr++)
+              //  std::cout << *itr << " ";
+            //std::cout << "ON TICK: " << tick << std::endl;
             this->emitRTS(this->uniqueID, tempset2, tick);
         }
     }
@@ -203,21 +207,34 @@ void Node::receiveCTS(unsigned short rstSourceID, const unsigned int &tick) {
 }
 
 void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick) {
-    if(!collision) {
-        if(sourceIDRTS == 0 && !sentRTS) {
+   //if(collisionTick == tick) {
+        if(collisionTick < tick && sourceIDRTS == 0 && !sentRTS) {
             if(destinationID.find(uniqueID) != destinationID.end()) {
                 sourceIDRTS = sourceID;
             }
-            else {//if(this->lastTickActed < tick) {
-                //delayEmitCTS = tick + 1;
-                backoffCounter++;
+            else {
+                if(this->lastTickActed < tick) {
+                    delayEmitCTS = tick + 1;
+                }
+                if( lastTickReceivedRTS < tick ) {
+                    backoffCounter++;
+                    lastTickReceivedRTS = tick;
+                }
+                else{
+                    //std::cout << "RTS COLLISION A" << std::endl;
+                    collisionTick = tick;
+                    sourceIDRTS = 0;
+                }
+
             }
         }
         else {
-            collision = true;
+            //std::cout << "RTS COLLISION B ON NODE: " << uniqueID <<
+              //  " WITH RTS FROM NODE " << sourceID << std::endl;
+            collisionTick = tick;
             sourceIDRTS = 0;
         }
-    }
+    //}
 }
 
 //written by Eric Smith

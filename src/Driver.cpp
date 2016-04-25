@@ -99,8 +99,12 @@ int main( int argc, char * argv[] ) {
 
         messageFile.close();
         // Create random network
+        std::cout << "Simulation with network coding" << std::endl;
         Simulator simulation(nodes,numNodes,packets);
         simulation.start();
+        std::cout << "Simulation without network coding (control)" << std::endl;
+        Simulator simulation2(nodes,numNodes,packets);
+        simulation2.start(false);
         // Create & start simulator
         //Simulator exampleSimulator;
         //exampleSimulator.log("testdata1,testdata2");
