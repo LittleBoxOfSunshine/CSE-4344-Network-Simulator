@@ -34,6 +34,8 @@ private:
 
     void runTick(); // Packets that finish transmitting during this tick will be added to Simulator::transmittedPackets
 
+    unsigned int CTS;
+    unsigned int RTS;
 public:
     Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets);
     std::queue<std::pair<unsigned short,Packet>> transmittedPackets;

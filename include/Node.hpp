@@ -60,8 +60,14 @@ public:
     static int MAX_DELAY_FOR_LOW_PRIORITY;
     static bool NETWORK_CODING;
 
+    unsigned int countRTS = 0;
+    unsigned int countCTS = 0;
+    unsigned int numSends = 0;//number of sends for specific node
+
     Node();
     Node(unsigned short uniqueID);
+
+    int getNumPacketsSent();
 
     void setNeighbors(std::set<Node*> & neighbors);
     void receivePacket(const Packet & packet, const unsigned int & tick); // Called by neighbor nodes when they send a packet
