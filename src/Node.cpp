@@ -208,8 +208,9 @@ void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinat
             if(destinationID.find(uniqueID) != destinationID.end()) {
                 sourceIDRTS = sourceID;
             }
-            else if(this->lastTickActed < tick) {
-                delayEmitCTS = tick + 1;
+            else {//if(this->lastTickActed < tick) {
+                //delayEmitCTS = tick + 1;
+                backoffCounter++;
             }
         }
         else {

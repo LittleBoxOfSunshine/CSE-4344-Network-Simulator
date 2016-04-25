@@ -20,7 +20,7 @@ class Simulator {
 private:
     static bool simulating;
     std::thread simulatorThread;
-    unsigned int sleepTime = 3;
+    unsigned int sleepTime = 1;
     unsigned int numDestinations;
     std::ofstream out;
     Queue<std::string> queue;
