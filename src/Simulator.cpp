@@ -98,18 +98,22 @@ void Simulator::start(bool networkCoding) {
     for (int i = 0; i < this->nodeCount; i++)
         this->nodes[i].buildRoutes();
 
+    int numTicksDataArrived=0;
     while (this->numDestinations > 0 ){
         if(this->currentTick%1000 == 0) {
             std::cout << "Starting Tick " << this->currentTick << ", " << numDestinations << " Destinations Remain..." << std::endl;
         }
         this->runTick();
         Packet transmitted;
+        if(!transmittedPackets.empty())
+        {
+            numTicksDataArrived++;
+        }
         while(!transmittedPackets.empty()){
             transmitted = transmittedPackets.front();
             transmittedPackets.pop();
-            numDestinations--;
-            std::string packetMessage = "Packet #" + std::to_string(transmitted.getUniqueID()) + " has reached a destination.";
-
+            this->numDestinations--;
+            std::string packetMessage = "Packet #" + std::to_string(transmitted.getUniqueID()) + " has reached destination node " + std::to_string(*(transmitted.getDestination().begin())) + " in " + std::to_string(this->currentTick - transmitted.getCreationTick()) + " ticks.";
             this->log(packetMessage);
         }
     }
