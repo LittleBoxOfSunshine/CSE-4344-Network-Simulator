@@ -22,9 +22,7 @@ struct PacketComparison;
 class Node {
 private:
 
-    const static int MAX_DELAY_FOR_LOW_PRIORITY = 10;
-
-    bool collision = false;
+    unsigned int collisionTick = 0;
     unsigned int delayEmitCTS = 0;
     unsigned short sourceIDRTS = 0;
     unsigned short sourceIDCTS = 0;
@@ -37,6 +35,7 @@ private:
     int alternateDelayTick = 0;
     bool sentRTS = false;
     int lastTickCTSDelay = 0;
+    int lastTickReceivedRTS = 0;
 
     static unsigned short sequenceID;
     unsigned short uniqueID;
@@ -58,6 +57,9 @@ private:
     std::set<Node*> buildTopology(); // fills allNodes to create topology of network
 
 public:
+    static int MAX_DELAY_FOR_LOW_PRIORITY;
+    static bool NETWORK_CODING;
+
     Node();
     Node(unsigned short uniqueID);
 

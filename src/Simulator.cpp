@@ -5,8 +5,8 @@
 
 #include "Simulator.hpp"
 
-//std::queue<Packet> Simulator::transmittedPackets;
-bool Simulator::simulating = true;
+int Node::MAX_DELAY_FOR_LOW_PRIORITY = 1024;
+bool Node::NETWORK_CODING = true;
 
 Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets)
         : nodes{nodes}
@@ -38,7 +38,7 @@ void Simulator::handler() {
     while(Simulator::simulating || !queue.getQueue().empty()) {
         if (!queue.getQueue().empty()) {
             //print to file
-            std::cout << queue.pop() << "\n";
+            this->out << queue.pop() << std::endl;
         }
         else {
             sleep(sleepTime);
@@ -48,8 +48,7 @@ void Simulator::handler() {
 
 //write string to log.csv
 void Simulator::log(std::string logString){
-    std::cout << logString << std::endl;
-    //queue.push(logString);
+    queue.push(logString);
 }
 
 //write vector to log.csv, separating values with comma
@@ -66,13 +65,13 @@ void Simulator::runTick() {
     // Queue packets in nodes to simulate them being "created" for the node to send when it can
     while(this->packetIndex < this->unaddedPackets.size() &&
             this->unaddedPackets[this->packetIndex].getCreationTick() <= this->currentTick) {
-        std::cout << "Adding packet to queue" <<
-                this->unaddedPackets[this->packetIndex].getSource() <<
-                " -> ";
+     //   std::cout << "Adding packet to queue" <<
+       //         this->unaddedPackets[this->packetIndex].getSource() <<
+         //       " -> ";
         auto t = this->unaddedPackets[this->packetIndex].getDestination();
-        for(auto itr = t.begin(); itr != t.end(); itr++)
-            std::cout << *itr << " ";
-        std::cout << std::endl;
+        //for(auto itr = t.begin(); itr != t.end(); itr++)
+          //  std::cout << *itr << " ";
+        //std::cout << std::endl;
         this->nodes[this->unaddedPackets[this->packetIndex].getSource()-1]
                 .queuePacket(this->unaddedPackets[this->packetIndex], this->currentTick);
         packetIndex++;
@@ -85,17 +84,20 @@ void Simulator::runTick() {
     this->currentTick++;
 }
 
-void Simulator::start() {
+void Simulator::start(bool networkCoding) {
+    if(!networkCoding) {
+        Node::MAX_DELAY_FOR_LOW_PRIORITY = 0;
+        Node::NETWORK_CODING = false;
+    }
+
     // Build routing tables on all nodes
     for (int i = 0; i < this->nodeCount; i++)
         this->nodes[i].buildRoutes();
 
     int numTicksDataArrived=0;
     while (this->numDestinations > 0 ){
-        if(this->currentTick%50 == 0) {
-            std::cout << "Starting Tick " << this->currentTick << ", " << numDestinations <<
-                " Destinations Remain...";
-            std::cout << std::endl;
+        if(this->currentTick%1000 == 0) {
+            std::cout << "Starting Tick " << this->currentTick << ", " << numDestinations << " Destinations Remain..." << std::endl;
         }
         this->runTick();
         Packet transmitted;
