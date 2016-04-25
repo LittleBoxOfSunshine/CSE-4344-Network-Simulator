@@ -8,6 +8,8 @@
 int Node::MAX_DELAY_FOR_LOW_PRIORITY = 1024;
 bool Node::NETWORK_CODING = true;
 
+bool SIMULTATING = false;
+
 Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets)
         : nodes{nodes}
         , nodeCount{nodeCount}
@@ -23,7 +25,7 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets)
     out.open(path);
 
     //start thread and store it
-    simulatorThread = std::thread(&Simulator::handler, this);
+    //simulatorThread = std::thread(&Simulator::handler, this);
 }
 
 Simulator::~Simulator(){
@@ -35,7 +37,7 @@ Simulator::~Simulator(){
 //elsewise sleep for user defined time
 void Simulator::handler() {
     std::cout << "start output thread" << std::endl;
-    while(Simulator::simulating || !queue.getQueue().empty()) {
+    while(SIMULTATING || !queue.getQueue().empty()) {
         if (!queue.getQueue().empty()) {
             //print to file
             this->out << queue.pop() << std::endl;
@@ -90,6 +92,8 @@ void Simulator::start(bool networkCoding) {
         Node::NETWORK_CODING = false;
     }
 
+    SIMULTATING = true;
+
     // Build routing tables on all nodes
     for (int i = 0; i < this->nodeCount; i++)
         this->nodes[i].buildRoutes();
@@ -105,11 +109,12 @@ void Simulator::start(bool networkCoding) {
             transmittedPackets.pop();
             numDestinations--;
             std::string packetMessage = "Packet #" + std::to_string(transmitted.getUniqueID()) + " has reached a destination.";
+
             this->log(packetMessage);
         }
     }
     sleep(Simulator::sleepTime*2);
-    Simulator::simulating = false;
-    simulatorThread.join();
+    SIMULTATING = false;
+    //simulatorThread.join();
     std::cout << "Simulation completed in " << this->currentTick << " ticks" << std::endl;
 }
