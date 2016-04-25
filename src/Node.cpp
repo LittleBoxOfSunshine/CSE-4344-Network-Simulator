@@ -360,3 +360,7 @@ void Node::printRoutingTable(){
     std::cout << "------------------------" << std::endl;
 
 }
+
+unsigned short Node::getUniqueID() {
+    return uniqueID;
+}
