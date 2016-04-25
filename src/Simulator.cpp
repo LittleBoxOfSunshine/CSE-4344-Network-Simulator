@@ -97,7 +97,11 @@ void Simulator::start(bool networkCoding) {
     // Build routing tables on all nodes
     for (int i = 0; i < this->nodeCount; i++)
         this->nodes[i].buildRoutes();
-
+    for (int i =0; i < unaddedPackets.size();i++)
+    {
+        this->log("Packet #"+std::to_string(unaddedPackets[i].getUniqueID())+" has creation tick "+std::to_string(unaddedPackets[i].getCreationTick())+"\n");
+    }
+    this->log("----------------\n");
     int numTicksDataArrived=0;
     while (this->numDestinations > 0 ){
         if(this->currentTick%1000 == 0) {
@@ -120,8 +124,19 @@ void Simulator::start(bool networkCoding) {
             this->log(packetMessage);
         }
     }
-    this->log("-----------------------------------\n");
+    this->log("----------------\n");
+    this->log("Total number of ticks: "+std::to_string(this->currentTick)+"\n");
+    this->log("----------------\n");
     this->log("Number of ticks during which a packet reached a destination: "+std::to_string(numTicksDataArrived)+"\n");
+    this->log("----------------\n");
+    this->log("Total number of CTS: "+std::to_string(this->CTS)+"\n");
+    this->log("----------------\n");
+    this->log("Total number of RTS: "+std::to_string(this->RTS)+"\n");
+    this->log("----------------\n");
+    for(int i = 0; i < nodeCount; i++)
+    {
+        this->log("Node #"+std::to_string(nodes[i].getUniqueID())+" sent "+std::to_string(nodes[i].getNumPacketsSent())+" total messages.\n");
+    }
     sleep(Simulator::sleepTime*2);
     SIMULTATING = false;
     //simulatorThread.join();
