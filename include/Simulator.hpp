@@ -21,7 +21,7 @@ private:
     static bool simulating;
     std::thread simulatorThread;
     unsigned int sleepTime = 3;
-    unsigned int numDestinations;
+    unsigned int numDestinations = 0;
     std::ofstream out;
     Queue<std::string> queue;
 
