@@ -5,7 +5,7 @@ numTicksCoding = 0
 numTicksNoCoding = 0
 writeData = open('tickdata.csv', 'w')
 for x in range(1,1000):
-	filename = "smallMeshLog" + x
+	filename = "smallMesh/smallMeshLog" + str(x)
 	dataFile = open(filename, 'r')
 	first = True
 	for line in dataFile:
@@ -18,13 +18,13 @@ for x in range(1,1000):
 avgTicksCoding = numTicksCoding / 1000
 avgTicksNoCoding = numTicksNoCoding / 1000
 
-writeData.write("10, " + avgTicksCoding + ", " + '10' + ", " + avgTicksNoCoding + "\n")
+writeData.write("10, " + str(avgTicksCoding) + ", " + '10' + ", " + str(avgTicksNoCoding) + "\n")
 
 
 numTicksCoding = 0
 numTicksNoCoding = 0
 for x in range(1,1000):
-	filename = "medMeshLog" + x
+	filename = "medMesh/medMeshLog" + str(x)
 	dataFile = open(filename, 'r')
 	first = True
 	for line in dataFile:
@@ -37,12 +37,12 @@ for x in range(1,1000):
 avgTicksCoding = numTicksCoding / 1000
 avgTicksNoCoding = numTicksNoCoding / 1000
 
-writeData.write("25, " + avgTicksCoding + ", " + '25' + ", " + avgTicksNoCoding)
+writeData.write("25, " + str(avgTicksCoding) + ", " + '25' + ", " + str(avgTicksNoCoding) + "\n")
 
 numTicksCoding = 0
 numTicksNoCoding = 0
 for x in range(1,1000):
-	filename = "largeMeshLog" + x
+	filename = "largeMesh/largeMeshLog" + str(x)
 	dataFile = open(filename, 'r')
 	first = True
 	for line in dataFile:
@@ -55,5 +55,5 @@ for x in range(1,1000):
 avgTicksCoding = numTicksCoding / 1000
 avgTicksNoCoding = numTicksNoCoding / 1000
 
-writeData.write("75, " + avgTicksCoding + ", " + '75' + ", " + avgTicksNoCoding)
+writeData.write("75, " + str(avgTicksCoding) + ", " + '75' + ", " + str(avgTicksNoCoding) + "\n");
 
