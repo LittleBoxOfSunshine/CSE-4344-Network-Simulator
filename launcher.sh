@@ -2,15 +2,25 @@
 
 echo "-----------------------------------------------"
 echo "hi, $USER"
-echo "How many iterations would you like to generate?"
-read input
-filename="input.txt"
 
-settings = "$1Settings"
-message = "$1Messages"
-output = "$1Log"
-low = $2
-high = $3
+
+if [ $4 -eq 1 ]
+	then
+	topology="Star"
+elif [ $4 -eq 2 ]
+	then
+	topology="Grid"
+elif [ $4 -eq 3 ]
+	then
+	topology="Mesh"
+fi
+
+sizeTop=${1}${topology}
+settings=${sizeTop}"/"${sizeTop}Settings
+message=${sizeTop}"/"${sizeTop}Messages
+output=${sizeTop}"/"${sizeTop}Log
+low=$2
+high=$3
 
 # for ((i=1;i<=input;i++)); do 
 # 	while read -r line
@@ -22,5 +32,12 @@ high = $3
 # done
 
 for ((i=$low;i<=$high;i++)); do
-	./a.out "$settings$i" "$message$i" "$output$i"
+	if [ $4 -eq 3 ]
+		then
+		echo ./a.out "$settings$i" "$message" "$output$i"
+		./a.out "$settings$i" "$message" "$output$i" &
+	else
+		echo ./a.out "$settings" "$message$i" "$output$i"
+		./a.out "$settings" "$message$i" "$output$i" &
+fi
 done
