@@ -1,6 +1,6 @@
 
-numTickString = "Total number of ticks: "
-numTickPacketString = "Number of ticks during which a packet reached a destination: "
+numTickString = "Total number of CTS: "
+numTickPacketString = "Total number of RTS: "
 numTicksCoding = 0
 numTicksNoCoding = 0
 numTickPacketCoding = 0
@@ -23,20 +23,21 @@ for x in range(1,1000):
 	dataFile.close()
 avgTicksCoding = numTicksCoding / 1000
 avgTicksNoCoding = numTicksNoCoding / 1000
-avgTickPacketCoding = numTickPacketCoding / 1000
-avgTickPacketNoCoding = numTickPacketNoCoding / 1000
+avgTickPacketCoding = float(numTickPacketCoding / 1000)
+avgTickPacketNoCoding = float(numTickPacketNoCoding / 1000)
 
 avgEfficiencyCoding = avgTickPacketCoding / avgTicksCoding
 avgEfficiencyNoCoding = avgTickPacketNoCoding / avgTicksNoCoding
+print avgTickPacketNoCoding
+print avgTicksNoCoding
 writeData.write("10, " + str(avgEfficiencyCoding) + ", " + '10' + ", " + str(avgEfficiencyNoCoding) + "\n")
 
 numTicksCoding = 0
 numTicksNoCoding = 0
 numTickPacketCoding = 0
 numTickPacketNoCoding = 0
-writeData = open('tickdata.csv', 'w')
 for x in range(1,1000):
-	filename = "medMesh/smallMeshLog" + str(x)
+	filename = "medMesh/medMeshLog" + str(x)
 	dataFile = open(filename, 'r')
 	first = True
 	for line in dataFile:
@@ -52,21 +53,22 @@ for x in range(1,1000):
 	dataFile.close()
 avgTicksCoding = numTicksCoding / 1000
 avgTicksNoCoding = numTicksNoCoding / 1000
-avgTickPacketCoding = numTickPacketCoding / 1000
-avgTickPacketNoCoding = numTickPacketNoCoding / 1000
+avgTickPacketCoding = float(numTickPacketCoding / 1000)
+avgTickPacketNoCoding = float(numTickPacketNoCoding / 1000)
 
+print avgTickPacketNoCoding
+print avgTicksNoCoding
 avgEfficiencyCoding = avgTickPacketCoding / avgTicksCoding
 avgEfficiencyNoCoding = avgTickPacketNoCoding / avgTicksNoCoding
-writeData.write("25, " + str(avgTicksCoding) + ", " + '25' + ", " + str(avgTicksNoCoding) + "\n")
+writeData.write("25, " + str(avgEfficiencyCoding) + ", " + '25' + ", " + str(avgEfficiencyNoCoding) + "\n")
 
 
 numTicksCoding = 0
 numTicksNoCoding = 0
 numTickPacketCoding = 0
 numTickPacketNoCoding = 0
-writeData = open('tickdata.csv', 'w')
 for x in range(1,1000):
-	filename = "largeMesh/smallMeshLog" + str(x)
+	filename = "largeMesh/largeMeshLog" + str(x)
 	dataFile = open(filename, 'r')
 	first = True
 	for line in dataFile:
@@ -82,10 +84,12 @@ for x in range(1,1000):
 	dataFile.close()
 avgTicksCoding = numTicksCoding / 1000
 avgTicksNoCoding = numTicksNoCoding / 1000
-avgTickPacketCoding = numTickPacketCoding / 1000
-avgTickPacketNoCoding = numTickPacketNoCoding / 1000
+avgTickPacketCoding = float(numTickPacketCoding / 1000)
+avgTickPacketNoCoding = float(numTickPacketNoCoding / 1000)
 
+print avgTickPacketNoCoding
+print avgTicksNoCoding
 avgEfficiencyCoding = avgTickPacketCoding / avgTicksCoding
 avgEfficiencyNoCoding = avgTickPacketNoCoding / avgTicksNoCoding
-writeData.write("75, " + str(avgTicksCoding) + ", " + '75' + ", " + str(avgTicksNoCoding) + "\n")
+writeData.write("75, " + str(avgEfficiencyCoding) + ", " + '75' + ", " + str(avgEfficiencyNoCoding) + "\n")
 
