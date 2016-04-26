@@ -32,7 +32,7 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets,s
 
 Simulator::~Simulator(){
     //delete[] this->nodes;
-    //out.close();
+    out.close();
 }
 
 //print to file if Simulator queue isn't empty
