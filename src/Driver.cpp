@@ -16,7 +16,7 @@ Node* meshGen(int numNodes, std::vector<std::vector<std::string>>& neighbors);
 int main( int argc, char * argv[] ) {
 
     // Check that required command line args were supplied
-    if( argc == 3 ){
+    if( argc == 4 ){
         // Load config
         std::string configPath = argv[1];
         std::ifstream configFile;
@@ -99,8 +99,13 @@ int main( int argc, char * argv[] ) {
 
         messageFile.close();
         // Create random network
-        Simulator simulation(nodes,numNodes,packets);
+        std::string logFilePath = argv[3];
+        std::cout << "Simulation with network coding" << std::endl;
+        Simulator simulation(nodes,numNodes,packets,logFilePath);
         simulation.start();
+        std::cout << "Simulation without network coding (control)" << std::endl;
+        Simulator simulation2(nodes,numNodes,packets,logFilePath);
+        simulation2.start(false);
         // Create & start simulator
         //Simulator exampleSimulator;
         //exampleSimulator.log("testdata1,testdata2");
@@ -109,6 +114,6 @@ int main( int argc, char * argv[] ) {
     // Invalid command line arguments, alert user and halt program
     else{
         std::cout << "ERROR: INVALID COMMAND LINE ARGS..." << std::endl
-                  << "       Proper Usage: <exec_cmd> <topology_conf_path> <message_file_path>" << std::endl;
+                  << "       Proper Usage: <exec_cmd> <topology_conf_path> <message_file_path> <log_file_path>" << std::endl;
     }
 }

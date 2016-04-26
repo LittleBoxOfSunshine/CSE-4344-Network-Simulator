@@ -10,6 +10,10 @@
 
 unsigned short Node::sequenceID = 0;
 
+unsigned int Node::countCTS = 0;
+
+unsigned int Node::countRTS = 0;
+
 void Node::sendPacket(const Packet & packet, const unsigned int &tick) {
     if( packet.getDestination().size() == 1){
         this->routingTable[*packet.getDestination().begin()]->receivePacket(packet, tick);
@@ -29,6 +33,7 @@ void Node::sendPacket(const Packet & packet, const unsigned int &tick) {
             temp.setDestination(n.second);
             // Route the packet
             n.first->receivePacket(temp, tick);
+            this->numSends++;
         }
     }
 }
@@ -39,6 +44,10 @@ Node::Node() { this->uniqueID = ++(Node::sequenceID); }
 Node::Node(unsigned short uniqueID)
         : uniqueID{uniqueID}
         { }
+
+int Node::getNumPacketsSent() {
+    return numSends;
+}
 
 void Node::setNeighbors(std::set<Node *> &neighbors) {
     this->neighbors = neighbors;
@@ -87,7 +96,7 @@ void Node::queuePacket(const Packet &p, const unsigned int & tick) {
         this->outQueueCount++;
 }
 
-void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmittedPackets) {
+void Node::slotAction(const unsigned int &tick, std::queue<std::pair<unsigned short,Packet>> & transmittedPackets) {
     ////////////////// READ //////////////////
 
     Packet temp;
@@ -96,7 +105,7 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
         this->inputBuffer.pop();
 
         if(temp.findAndRemove(this->uniqueID))
-            transmittedPackets.push(temp);
+            transmittedPackets.push(std::pair<unsigned short,Packet>(this->uniqueID,temp));
 
         if(temp.getDestination().size() > 0)
             this->queuePacket(temp, tick);
@@ -109,20 +118,23 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
     }
 
     ////////////////// SEND + SCHEDULE //////////////////
-
-    if( this->sourceIDRTS != 0 && delayEmitCTS <= tick) {
-        std::cout << "EMITING CTS FROM NODE: " << uniqueID <<
-                " TO NODE: " << this->sourceIDRTS << " ON TICK: " << tick << std::endl;
+    if( this->sourceIDRTS != 0 && collisionTick -1 < tick) {
+        // std::cout << "EMITING CTS FROM NODE: " << uniqueID << " TO NODE: " << this->sourceIDRTS << " ON TICK: " << tick << std::endl;
         this->emitCTS(this->sourceIDRTS, tick);
         this->sourceIDRTS = 0;
     }
     else if( this->canSend ){
-        std::cout << "SENDING PACKET FROM NODE: " << uniqueID << " ON TICK: " << tick << std::endl;
-
-        while(this->outputBuffer.size() - this->outQueueCount > 0) {
+        // std::cout << "SENDING PACKET FROM NODE: " << uniqueID << " ON TICK: " << tick << std::endl;
+        if(this->outputBuffer.size() - this->outQueueCount > 0) {
             this->sendPacket(this->outputBuffer.front(), tick);
             this->outputBuffer.erase(this->outputBuffer.begin());
-            //this->outQueueCount -= 1;
+        }
+
+        if(Node::NETWORK_CODING) {
+            while(this->outputBuffer.size() - this->outQueueCount > 0) {
+                this->sendPacket(this->outputBuffer.front(), tick);
+                this->outputBuffer.erase(this->outputBuffer.begin());
+            }
         }
 
         this->outQueueCount = 0;
@@ -158,10 +170,10 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
             for(auto itr = tempset.begin(); itr != tempset.end(); itr++)
                 tempset2.insert(routingTable[*itr]->uniqueID);
 
-            std::cout << "EMITTING RTS FROM NODE: " << uniqueID << " TO NODE(s): ";
-            for(auto itr = tempset2.begin(); itr != tempset2.end(); itr++)
-                std::cout << *itr << " ";
-            std::cout << "ON TICK: " << tick << std::endl;
+            //std::cout << "EMITING RTS FROM NODE: " << uniqueID << " TO NODE(s): ";
+            //for(auto itr = tempset2.begin(); itr != tempset2.end(); itr++)
+              //  std::cout << *itr << " ";
+            //std::cout << "ON TICK: " << tick << std::endl;
             this->emitRTS(this->uniqueID, tempset2, tick);
         }
     }
@@ -174,6 +186,7 @@ void Node::slotAction(const unsigned int &tick, std::queue<Packet> & transmitted
 }
 
 void Node::emitCTS(unsigned short sourceID, const unsigned int &tick) {
+    Node::countCTS++;
     //call receive cts on all neighbors
     for(auto &n : neighbors) {
         n->receiveCTS(sourceID, tick);
@@ -182,6 +195,7 @@ void Node::emitCTS(unsigned short sourceID, const unsigned int &tick) {
 }
 
 void Node::emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick) {
+    Node::countRTS++;
     //call receive rts on all neighbors
     for(auto &n : neighbors) {
         n->receiveRTS(sourceID, destinationID, tick);
@@ -203,20 +217,34 @@ void Node::receiveCTS(unsigned short rstSourceID, const unsigned int &tick) {
 }
 
 void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick) {
-    if(!collision) {
-        if(sourceIDRTS == 0 && !sentRTS) {
+   //if(collisionTick == tick) {
+        if(collisionTick < tick && sourceIDRTS == 0 && !sentRTS) {
             if(destinationID.find(uniqueID) != destinationID.end()) {
                 sourceIDRTS = sourceID;
             }
-            else if(this->lastTickActed < tick) {
-                delayEmitCTS = tick + 1;
+            else {
+                if(this->lastTickActed < tick) {
+                    delayEmitCTS = tick + 1;
+                }
+                if( lastTickReceivedRTS < tick ) {
+                    backoffCounter++;
+                    lastTickReceivedRTS = tick;
+                }
+                else{
+                    //std::cout << "RTS COLLISION A" << std::endl;
+                    collisionTick = tick;
+                    sourceIDRTS = 0;
+                }
+
             }
         }
         else {
-            collision = true;
+            //std::cout << "RTS COLLISION B ON NODE: " << uniqueID <<
+              //  " WITH RTS FROM NODE " << sourceID << std::endl;
+            collisionTick = tick;
             sourceIDRTS = 0;
         }
-    }
+    //}
 }
 
 //written by Eric Smith
@@ -341,4 +369,8 @@ void Node::printRoutingTable(){
     }
     std::cout << "------------------------" << std::endl;
 
+}
+
+unsigned short Node::getUniqueID() {
+    return uniqueID;
 }

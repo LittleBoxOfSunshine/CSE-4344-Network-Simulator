@@ -22,9 +22,7 @@ struct PacketComparison;
 class Node {
 private:
 
-    const static int MAX_DELAY_FOR_LOW_PRIORITY = 10;
-
-    bool collision = false;
+    unsigned int collisionTick = 0;
     unsigned int delayEmitCTS = 0;
     unsigned short sourceIDRTS = 0;
     unsigned short sourceIDCTS = 0;
@@ -37,6 +35,7 @@ private:
     int alternateDelayTick = 0;
     bool sentRTS = false;
     int lastTickCTSDelay = 0;
+    int lastTickReceivedRTS = 0;
 
     static unsigned short sequenceID;
     unsigned short uniqueID;
@@ -58,14 +57,23 @@ private:
     std::set<Node*> buildTopology(); // fills allNodes to create topology of network
 
 public:
+    static int MAX_DELAY_FOR_LOW_PRIORITY;
+    static bool NETWORK_CODING;
+    //Counterers for CTS and RTS
+    static unsigned int countRTS;
+    static unsigned int countCTS;
+    unsigned int numSends = 0;//number of sends for specific node
+
     Node();
     Node(unsigned short uniqueID);
+
+    int getNumPacketsSent();
 
     void setNeighbors(std::set<Node*> & neighbors);
     void receivePacket(const Packet & packet, const unsigned int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p, const unsigned int & tick); // Called by simulator when a packet is "created" for the node to send
-    void slotAction(const unsigned int & tick, std::queue<Packet> & transmittedPackets);
-
+    void slotAction(const unsigned int & tick, std::queue<std::pair<unsigned short,Packet>> & transmittedPackets);
+    unsigned short getUniqueID();
     // Called by simulator to run the node's actions during the current time slot (tick)
     void receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick);
     void receiveCTS(unsigned short rstSourceID, const unsigned int & tick);
