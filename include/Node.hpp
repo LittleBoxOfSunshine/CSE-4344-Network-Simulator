@@ -52,16 +52,18 @@ private:
     unsigned int lastTickActed; // Last tick that the node acted on, always updated by Node::slotAction()
 
     void sendPacket(const Packet & packet, const unsigned int &tick);
-    void emitCTS(unsigned short sourceID, const unsigned int & tick);
-    void emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick);
+    void emitCTS(unsigned short sourceID, const unsigned int & tick, bool & tickWasActive);
+    void emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick, bool & tickWasActive);
     std::set<Node*> buildTopology(); // fills allNodes to create topology of network
 
 public:
     static int MAX_DELAY_FOR_LOW_PRIORITY;
     static bool NETWORK_CODING;
-    //Counterers for CTS and RTS
+    //Counters for CTS and RTS
     static unsigned int countRTS;
     static unsigned int countCTS;
+    static unsigned int countReceiveRTS;
+    static unsigned int countReceiveCTS;
     unsigned int numSends = 0;//number of sends for specific node
 
     Node();
@@ -72,7 +74,7 @@ public:
     void setNeighbors(std::set<Node*> & neighbors);
     void receivePacket(const Packet & packet, const unsigned int & tick); // Called by neighbor nodes when they send a packet
     void queuePacket(const Packet & p, const unsigned int & tick); // Called by simulator when a packet is "created" for the node to send
-    void slotAction(const unsigned int & tick, std::queue<std::pair<unsigned short,Packet>> & transmittedPackets);
+    void slotAction(const unsigned int & tick, std::queue<std::pair<unsigned short,Packet>> & transmittedPackets, bool & tickWasActive);
     unsigned short getUniqueID();
     // Called by simulator to run the node's actions during the current time slot (tick)
     void receiveRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick);
