@@ -1,4 +1,4 @@
-tickArriveString = "Packet #"
+tickArriveString = "has reached destination"
 numTicksCoding = 0
 numTicksNoCoding = 0
 
@@ -11,14 +11,14 @@ for x in range(1,1000):
 	first = True
 	for line in dataFile:
 		if tickArriveString in line and first:
-			start = line.find('in')
+			start = line.find(' in ')
 			end = line.find(' ticks')
-			numTicksCoding += int(line[start+3:end])
+			numTicksCoding += int(line[start+4:end])
 			counterCoding+=1
 		elif tickArriveString in line:
-			start = line.find('in')
+			start = line.find(' in ')
 			end = line.find(' ticks')
-			numTicksNoCoding += int(line[start+3:end])
+			numTicksNoCoding += int(line[start+4:end])
 			counterNoCoding+=1
 		elif "End of simulator" in line:
 			first = False
@@ -26,9 +26,8 @@ for x in range(1,1000):
 avgTicksCoding = numTicksCoding / counterCoding
 avgTicksNoCoding = numTicksNoCoding / counterNoCoding
 
-writeData.write("10, " + str(avgTicksCoding) + ", " + '10' + ", " + str(avgTicksNoCoding) + "\n")
+writeData.write("10, " + str(counterCoding) + ", " + '10' + ", " + str(counterNoCoding) + "\n")
 
-tickArriveString = "Packet #"
 numTicksCoding = 0
 numTicksNoCoding = 0
 
@@ -40,14 +39,14 @@ for x in range(1,1000):
 	first = True
 	for line in dataFile:
 		if tickArriveString in line and first:
-			start = line.find('in')
+			start = line.find(' in ')
 			end = line.find(' ticks')
-			numTicksCoding += int(line[start+3:end])
+			numTicksCoding += int(line[start+4:end])
 			counterCoding+=1
 		elif tickArriveString in line:
-			start = line.find('in')
+			start = line.find(' in ')
 			end = line.find(' ticks')
-			numTicksNoCoding += int(line[start+3:end])
+			numTicksNoCoding += int(line[start+4:end])
 			counterNoCoding+=1
 		elif "End of simulator" in line:
 			first = False
@@ -55,8 +54,7 @@ for x in range(1,1000):
 avgTicksCoding = numTicksCoding / counterCoding
 avgTicksNoCoding = numTicksNoCoding / counterNoCoding
 
-writeData.write("25, " + str(avgTicksCoding) + ", " + '25' + ", " + str(avgTicksNoCoding) + "\n")
-tickArriveString = "Packet #"
+writeData.write("25, " + str(counterCoding) + ", " + '25' + ", " + str(counterNoCoding) + "\n")
 numTicksCoding = 0
 numTicksNoCoding = 0
 
@@ -68,14 +66,14 @@ for x in range(1,1000):
 	first = True
 	for line in dataFile:
 		if tickArriveString in line and first:
-			start = line.find('in')
+			start = line.find(' in ')
 			end = line.find(' ticks')
-			numTicksCoding += int(line[start+3:end])
+			numTicksCoding += int(line[start+4:end])
 			counterCoding+=1
 		elif tickArriveString in line:
-			start = line.find('in')
+			start = line.find(' in ')
 			end = line.find(' ticks')
-			numTicksNoCoding += int(line[start+3:end])
+			numTicksNoCoding += int(line[start+4:end])
 			counterNoCoding+=1
 		elif "End of simulator" in line:
 			first = False
@@ -83,4 +81,4 @@ for x in range(1,1000):
 avgTicksCoding = numTicksCoding / counterCoding
 avgTicksNoCoding = numTicksNoCoding / counterNoCoding
 
-writeData.write("75, " + str(avgTicksCoding) + ", " + '75' + ", " + str(avgTicksNoCoding) + "\n")
+writeData.write("75, " + str(counterCoding) + ", " + '75' + ", " + str(counterNoCoding) + "\n")

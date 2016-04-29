@@ -17,6 +17,7 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets,s
 {
     Node::countCTS = 0;
     Node::countRTS = 0;
+    this->currentTick = 1;
     for(int i = 0;i<packets.size();i++) {
         this->numDestinations+=packets[i].getDestination().size();
     }
