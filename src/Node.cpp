@@ -6,13 +6,16 @@
 #include <stack>
 
 #include "Node.hpp"
-#include "Simulator.hpp"
 
 unsigned short Node::sequenceID = 0;
 
 unsigned int Node::countCTS = 0;
 
 unsigned int Node::countRTS = 0;
+
+unsigned int Node::countReceiveRTS = 0;
+
+unsigned int Node::countReceiveCTS = 0;
 
 void Node::sendPacket(const Packet & packet, const unsigned int &tick) {
     if( packet.getDestination().size() == 1){
@@ -96,7 +99,7 @@ void Node::queuePacket(const Packet &p, const unsigned int & tick) {
         this->outQueueCount++;
 }
 
-void Node::slotAction(const unsigned int &tick, std::queue<std::pair<unsigned short,Packet>> & transmittedPackets) {
+void Node::slotAction(const unsigned int &tick, std::queue<std::pair<unsigned short,Packet>> & transmittedPackets, bool & tickWasActive) {
     ////////////////// READ //////////////////
 
     Packet temp;
@@ -120,7 +123,7 @@ void Node::slotAction(const unsigned int &tick, std::queue<std::pair<unsigned sh
     ////////////////// SEND + SCHEDULE //////////////////
     if( this->sourceIDRTS != 0 && collisionTick -1 < tick) {
         // std::cout << "EMITING CTS FROM NODE: " << uniqueID << " TO NODE: " << this->sourceIDRTS << " ON TICK: " << tick << std::endl;
-        this->emitCTS(this->sourceIDRTS, tick);
+        this->emitCTS(this->sourceIDRTS, tick, tickWasActive);
         this->sourceIDRTS = 0;
     }
     else if( this->canSend ){
@@ -174,7 +177,7 @@ void Node::slotAction(const unsigned int &tick, std::queue<std::pair<unsigned sh
             //for(auto itr = tempset2.begin(); itr != tempset2.end(); itr++)
               //  std::cout << *itr << " ";
             //std::cout << "ON TICK: " << tick << std::endl;
-            this->emitRTS(this->uniqueID, tempset2, tick);
+            this->emitRTS(this->uniqueID, tempset2, tick, tickWasActive);
         }
     }
     else{
@@ -185,7 +188,7 @@ void Node::slotAction(const unsigned int &tick, std::queue<std::pair<unsigned sh
     this->queueCount = 0;
 }
 
-void Node::emitCTS(unsigned short sourceID, const unsigned int &tick) {
+void Node::emitCTS(unsigned short sourceID, const unsigned int &tick, bool & tickWasActive) {
     Node::countCTS++;
     //call receive cts on all neighbors
     for(auto &n : neighbors) {
@@ -194,7 +197,7 @@ void Node::emitCTS(unsigned short sourceID, const unsigned int &tick) {
     backoffCounter++;
 }
 
-void Node::emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick) {
+void Node::emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick, bool & tickWasActive) {
     Node::countRTS++;
     //call receive rts on all neighbors
     for(auto &n : neighbors) {
@@ -209,6 +212,7 @@ void Node::receiveCTS(unsigned short rstSourceID, const unsigned int &tick) {
         canSend = true;
         lastSuccessfulRTSTick = tick - 1;
         sentRTS = false;
+        Node::countReceiveCTS++;
     }
     else if(this->lastTickActed < tick && lastTickCTSDelay < tick) {
         this->backoffCounter++;
@@ -221,6 +225,7 @@ void Node::receiveRTS(unsigned short sourceID, std::set<unsigned short> destinat
         if(collisionTick < tick && sourceIDRTS == 0 && !sentRTS) {
             if(destinationID.find(uniqueID) != destinationID.end()) {
                 sourceIDRTS = sourceID;
+                Node::countReceiveRTS++;
             }
             else {
                 if(this->lastTickActed < tick) {

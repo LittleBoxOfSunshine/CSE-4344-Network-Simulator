@@ -17,7 +17,7 @@ Simulator::Simulator(Node* nodes, int nodeCount, std::vector<Packet> & packets,s
 {
     Node::countCTS = 0;
     Node::countRTS = 0;
-    this->currentTick = 1;
+    this->currentTick = 0;
     for(int i = 0;i<packets.size();i++) {
         this->numDestinations+=packets[i].getDestination().size();
     }
@@ -85,7 +85,12 @@ void Simulator::runTick() {
 
     // Have all nodes act
     for(int i = 0; i < this->nodeCount; i++)
-        this->nodes[i].slotAction(this->currentTick, Simulator::transmittedPackets);
+        this->nodes[i].slotAction(this->currentTick, Simulator::transmittedPackets, this->tickWasActive);
+
+    if(this->tickWasActive) {
+        this->countActiveTicks++;
+        this->tickWasActive = false;
+    }
 
     this->currentTick++;
 }
@@ -112,6 +117,10 @@ void Simulator::start(bool networkCoding) {
     }
     this->log("----------------\n");
     int numTicksDataArrived=0;
+
+    this->log("Number of Destinations: " + std::to_string(numDestinations) + "\n");
+    this->log("----------------\n");
+
     while (this->numDestinations > 0 ){
         if(this->currentTick%1000 == 0) {
             std::cout << "Starting Tick " << this->currentTick << ", " << numDestinations << " Destinations Remain..." << std::endl;
@@ -138,10 +147,15 @@ void Simulator::start(bool networkCoding) {
     this->log("----------------\n");
     this->log("Number of ticks during which a packet reached a destination: "+std::to_string(numTicksDataArrived)+"\n");
     this->log("----------------\n");
-    this->log("Total number of CTS: "+std::to_string(Node::countCTS)+"\n");
+    this->log("Total number of CTS Emit: "+std::to_string(Node::countCTS)+"\n");
     this->log("----------------\n");
-    this->log("Total number of RTS: "+std::to_string(Node::countRTS)+"\n");
+    this->log("Total number of RTS Emit: "+std::to_string(Node::countRTS)+"\n");
     this->log("----------------\n");
+    this->log("Total number of CTS Receive: "+std::to_string(Node::countReceiveCTS)+"\n");
+    this->log("----------------\n");
+    this->log("Total number of RTS Receive: "+std::to_string(Node::countReceiveRTS)+"\n");
+    this->log("----------------\n");
+    this->log("Total number of active ticks: "+std::to_string(this->countActiveTicks)+"\n");
     for(int i = 0; i < nodeCount; i++)
     {
         this->log("Node #"+std::to_string(nodes[i].getUniqueID())+" sent "+std::to_string(nodes[i].getNumPacketsSent())+" total messages.\n");
