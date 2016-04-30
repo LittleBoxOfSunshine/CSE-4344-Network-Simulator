@@ -102,7 +102,7 @@ void Simulator::start(bool networkCoding) {
         this->log("Starting simulator without network coding.\n");
     }
     else{
-        this->log("Staring simulator with network coding.\n");
+        this->log("Starting simulator with network coding.\n");
     }
 
     this->log("----------------\n");
