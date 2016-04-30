@@ -4,72 +4,90 @@ lncString = "with network coding"
 noLncString = "Starting simulator without network coding"
 tickString = "Total number of ticks: "
 tickPacketString = "Number of ticks during which a packet reached a destination: "
-ctsString = "Total number of CTS: "
-rtsString = "Total number of RTS: "
+ctsEmitString = "Total number of CTS Emit: "
+rtsEmitString = "Total number of RTS Emit: "
+ctsReceiveString = "Total number of CTS Receive: "
+rtsReceiveString = "Total number of RTS Receive: "
 endSimulatorString = "End of simulator"
 
-iterations = 1000
+iterations = 1
 
 usingLnc = {}
 noLnc = {}
 
-usingLnc["totalTicks"] = 0
-usingLnc["totalTicksCount"] = 0
-usingLnc["tickPacket"] = 0
-usingLnc["tickPacketCount"] = 0
-usingLnc["ctsNum"] = 0
-usingLnc["ctsNumCount"] = 0
-usingLnc["rtsNum"] = 0
-usingLnc["rtsNumCount"] = 0
+usingLnc["totalTicks"] = [0, 0]	#[value, # of times this value was taken]
+usingLnc["tickPacket"] = [0, 0]
+usingLnc["ctsEmit"] = [0, 0]
+usingLnc["rtsEmit"] = [0, 0]
+usingLnc["ctsReceive"] = [0, 0]
+usingLnc["rtsReceive"] = [0, 0]
 
-noLnc["totalTicks"] = 0
-noLnc["totalTicksCount"] = 0
-noLnc["tickPacket"] = 0
-noLnc["tickPacketCount"] = 0
-noLnc["ctsNum"] = 0
-noLnc["ctsNumCount"] = 0
-noLnc["rtsNum"] = 0
-noLnc["rtsNumCount"] = 0
-
+noLnc["totalTicks"] = [0, 0]
+noLnc["tickPacket"] = [0, 0]
+noLnc["ctsEmit"] = [0, 0]
+noLnc["rtsEmit"] = [0, 0]
+noLnc["ctsReceive"] = [0, 0]
+noLnc["rtsReceive"] = [0, 0]
 
 fileType = sys.argv[1]
-usingLnc = True
 for x in range(1, iterations+1):
 	filename = fileType + "/" + fileType + "Log" + str(x)
+	filename = "logfile" 	#for testing
 	dataFile = open(filename, 'r')
+	lnc = True
 
 	for line in dataFile:
 		if lncString in line:
-			print "Using LNC"
-			if tickString in line:
-				usingLnc["totalTicks"] += int(line[len(tickString):])
-				usingLnc["totalTicksCount"] += 1
-			elif tickPacketString in line:
-				usingLnc["tickPacket"] += int(line[len(tickPacketString):])
-				usingLnc["tickPacketCount"] += 1
-			elif ctsString in line:
-				usingLnc["ctsNum"] += int(line[len(ctsString):])
-				usingLnc["ctsNumCount"] += 1
-			elif rtsString in line:
-				usingLnc["rtsNum"] += int(line[len(rtsString):])
-				usingLnc["rtsNumCount"] += 1
-			elif endSimulatorString in line:
-					print
-					usingLnc = False
+			lnc = True
 		elif noLncString in line:
-			print "Not using LNC"
+			lnc = False
+		if lnc:
 			if tickString in line:
-				noLnc["totalTicks"] += int(line[len(tickString):])
-				noLnc["totalTicksCount"] += 1
+				usingLnc["totalTicks"][0] += int(line[len(tickString):])
+				usingLnc["totalTicks"][1] += 1
 			elif tickPacketString in line:
-				noLnc["tickPacket"] += int(line[len(tickPacketString):])
-				noLnc["tickPacketCount"] += 1
-			elif ctsString in line:
-				noLnc["ctsNum"] += int(line[len(ctsString):])
-				noLnc["ctsNumCount"] += 1
-			elif rtsString in line:
-				noLnc["rtsNum"] += int(line[len(rtsString):])
-				noLnc["rtsNumCount"] += 1
+				usingLnc["tickPacket"][0] += int(line[len(tickPacketString):])
+				usingLnc["tickPacket"][1] += 1
+			elif ctsEmitString in line:
+				usingLnc["ctsEmit"][0] += int(line[len(ctsEmitString):])
+				usingLnc["ctsEmit"][1] += 1
+			elif rtsEmitString in line:
+				usingLnc["rtsEmit"][0] += int(line[len(rtsEmitString):])
+				usingLnc["rtsEmit"][1] += 1
+			elif ctsReceiveString in line:
+				usingLnc["ctsReceive"][0] += int(line[len(ctsReceiveString):])
+				usingLnc["ctsReceive"][1] += 1
+			elif rtsReceiveString in line:
+				usingLnc["rtsReceive"][0] += int(line[len(ctsReceiveString):])
+				usingLnc["rtsReceive"][1] += 1
 			elif endSimulatorString in line:
-				print
-		
+					lnc = False
+		else:
+			if tickString in line:
+				noLnc["totalTicks"][0] += int(line[len(tickString):])
+				noLnc["totalTicks"][1] += 1
+			elif tickPacketString in line:
+				noLnc["tickPacket"][0] += int(line[len(tickPacketString):])
+				noLnc["tickPacket"][1] += 1
+			elif ctsEmitString in line:
+				noLnc["ctsEmit"][0] += int(line[len(ctsEmitString):])
+				noLnc["ctsEmit"][1] += 1
+			elif rtsEmitString in line:
+				noLnc["rtsEmit"][0] += int(line[len(rtsEmitString):])
+				noLnc["rtsEmit"][1] += 1
+			elif ctsReceiveString in line:
+				noLnc["ctsReceive"][0] += int(line[len(ctsReceiveString):])
+				noLnc["ctsReceive"][1] += 1
+			elif rtsReceiveString in line:
+				noLnc["rtsReceive"][0] += int(line[len(ctsReceiveString):])
+				noLnc["rtsReceive"][1] += 1
+			elif endSimulatorString in line:
+				lnc = True
+
+print "Using LNC"
+for x in usingLnc.keys():
+	print x + " " + str(usingLnc[x])
+
+print "\nNot Using LNC"
+for x in noLnc.keys():
+	print x + " " + str(noLnc[x])
