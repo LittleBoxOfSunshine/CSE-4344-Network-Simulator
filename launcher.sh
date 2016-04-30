@@ -32,12 +32,25 @@ high=$3
 # done
 
 for ((i=$low;i<=$high;i++)); do
-	if [ $4 -eq 3 ]
-		then
-		echo ./a.out "$settings$i" "$message" "$output$i"
-		./a.out "$settings$i" "$message" "$output$i" &
-	else
-		echo ./a.out "$settings" "$message$i" "$output$i"
-		./a.out "$settings" "$message$i" "$output$i" &
+	if (( $i % 10 ))
+    	then
+	    if [ $4 -eq 3 ]
+		    then
+		    echo ./a.out "$settings$i" "$message" "$output$i" &
+		    ./a.out "$settings$i" "$message" "$output$i" &
+	    else
+		    echo ./a.out "$settings" "$message$i" "$output$i" &
+		    ./a.out "$settings" "$message$i" "$output$i" &
+		fi
+    else
+        if [ $4 -eq 3 ]
+    	    then
+    	    echo ./a.out "$settings$i" "$message" "$output$i"
+    	    ./a.out "$settings$i" "$message" "$output$i"
+        else
+    	    echo ./a.out "$settings" "$message$i" "$output$i"
+    	    ./a.out "$settings" "$message$i" "$output$i"
+    	fi
+
 fi
 done
