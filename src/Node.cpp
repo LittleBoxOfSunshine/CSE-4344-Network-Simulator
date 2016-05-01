@@ -336,7 +336,7 @@ void Node::buildRoutes() {
 
     //populate routingTable
     for(auto& x : initialRouting ){
-        std::tuple<unsigned short, int, Node*> tempT = x.second;
+        std::tuple<unsigned short, unsigned int, Node*> tempT = x.second;
         //int dist = std::get<1>(tempT); //distance
         routingTable.insert({x.first->uniqueID, std::get<2>(tempT)});
     }
