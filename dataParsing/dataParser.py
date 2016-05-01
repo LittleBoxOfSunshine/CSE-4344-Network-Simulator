@@ -11,6 +11,7 @@ rtsReceiveString = "Total number of RTS Receive: "
 endSimulatorString = "End of simulator"
 numDestString = "Number of Destinations: "
 latencyString = "has reached destination node"
+activeTicksString = "Total number of active ticks: "
 
 iterations = 1
 
@@ -25,6 +26,7 @@ usingLnc["ctsReceive"] = [0, 0]
 usingLnc["rtsReceive"] = [0, 0]
 usingLnc["numDest"] = [0, 0]
 usingLnc["latency"] = [0, 0]
+usingLnc["activeTicks"] = [0, 0]
 
 noLnc["totalTicks"] = [0, 0]
 noLnc["tickPacket"] = [0, 0]
@@ -34,6 +36,7 @@ noLnc["ctsReceive"] = [0, 0]
 noLnc["rtsReceive"] = [0, 0]
 noLnc["numDest"] = [0, 0]
 noLnc["latency"] = [0, 0]
+noLnc["activeTicks"] = [0, 0]
 
 fileType = sys.argv[1]
 for x in range(1, iterations+1):
@@ -72,6 +75,9 @@ for x in range(1, iterations+1):
 			elif rtsReceiveString in line:
 				usingLnc["rtsReceive"][0] += int(line[len(ctsReceiveString):])
 				usingLnc["rtsReceive"][1] += 1
+			elif activeTicksString in line:
+				usingLnc["activeTicks"][0] += int(line[len(activeTicksString):])
+				usingLnc["activeTicks"][1] += 1
 			elif endSimulatorString in line:
 					lnc = False
 		else:
@@ -99,6 +105,9 @@ for x in range(1, iterations+1):
 			elif rtsReceiveString in line:
 				noLnc["rtsReceive"][0] += int(line[len(ctsReceiveString):])
 				noLnc["rtsReceive"][1] += 1
+			elif activeTicksString in line:
+				noLnc["activeTicks"][0] += int(line[len(activeTicksString):])
+				noLnc["activeTicks"][1] += 1
 			elif endSimulatorString in line:
 				lnc = True
 
