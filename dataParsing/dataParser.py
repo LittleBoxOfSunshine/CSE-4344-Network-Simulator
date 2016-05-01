@@ -13,7 +13,7 @@ numDestString = "Number of Destinations: "
 latencyString = "has reached destination node"
 activeTicksString = "Total number of active ticks: "
 
-iterations = 1
+iterations = 1000		#Num of iterations of log loops
 
 usingLnc = {}
 noLnc = {}
@@ -40,8 +40,8 @@ noLnc["activeTicks"] = [0, 0]
 
 fileType = sys.argv[1]
 for x in range(1, iterations+1):
-	filename = fileType + "/" + fileType + "Log" + str(x)
-	filename = "logfile" 	#for testing
+	filename = fileType + str(x)
+	#filename = "logfile" 	#for testing
 	dataFile = open(filename, 'r')
 	lnc = True
 
@@ -110,11 +110,11 @@ for x in range(1, iterations+1):
 				noLnc["activeTicks"][1] += 1
 			elif endSimulatorString in line:
 				lnc = True
-
-print "Using LNC"
+	dataFile.close()
+print "Using LNC Averages"
 for x in usingLnc.keys():
-	print x + " " + str(usingLnc[x])
+	print x + " " + str(usingLnc[x][0]/float(usingLnc[x][1]))
 
-print "\nNot Using LNC"
+print "\nNot Using LNC Averages"
 for x in noLnc.keys():
-	print x + " " + str(noLnc[x])
+	print x + " " + str(noLnc[x][0]/float(noLnc[x][1]))
