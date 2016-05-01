@@ -87,7 +87,7 @@ void Simulator::runTick() {
     for(int i = 0; i < this->nodeCount; i++)
         this->nodes[i].slotAction(this->currentTick, Simulator::transmittedPackets, this->tickWasActive);
 
-    if(this->tickWasActive) {
+    if(this->tickWasActive || !Simulator::transmittedPackets.empty()) {
         this->countActiveTicks++;
         this->tickWasActive = false;
     }

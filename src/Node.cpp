@@ -190,6 +190,7 @@ void Node::slotAction(const unsigned int &tick, std::queue<std::pair<unsigned sh
 
 void Node::emitCTS(unsigned short sourceID, const unsigned int &tick, bool & tickWasActive) {
     Node::countCTS++;
+    tickWasActive = true;
     //call receive cts on all neighbors
     for(auto &n : neighbors) {
         n->receiveCTS(sourceID, tick);
@@ -199,6 +200,7 @@ void Node::emitCTS(unsigned short sourceID, const unsigned int &tick, bool & tic
 
 void Node::emitRTS(unsigned short sourceID, std::set<unsigned short> destinationID, const unsigned int &tick, bool & tickWasActive) {
     Node::countRTS++;
+    tickWasActive = true;
     //call receive rts on all neighbors
     for(auto &n : neighbors) {
         n->receiveRTS(sourceID, destinationID, tick);
