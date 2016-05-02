@@ -94,17 +94,16 @@ for x in range(1, iterations+1):
 				lnc = True
 	dataFile.close()
 
-print usingLnc["totalTicks"]
 mean = lambda MyList : reduce(lambda x, y: x + y, MyList) / float(len(MyList))
 stdv = lambda MyList : (reduce(lambda x,y : x + y , map(lambda x: (x-mean(MyList))**2 , MyList)) / float(len(MyList)))**.5
 writeFile = open(fileType + "Results.csv", 'w')
-writeFile.write("Using LNC,Mean,Min,Max,STDV\n")
+writeFile.write("Using LNC,Min,Max,Mean,STDV\n")
 for x in usingLnc.keys():
-	write =  x + "," + str(mean(usingLnc[x])) + "," + str(min(usingLnc[x])) + "," + str(max(usingLnc[x])) + "," + str(stdv(usingLnc[x]))
+	write =  x + "," + str(min(usingLnc[x])) + "," +  str(max(usingLnc[x])) + "," + str(mean(usingLnc[x])) + "," + str(stdv(usingLnc[x]))
 	writeFile.write(write+"\n")
 
-writeFile.write("\nNo LNC,Mean,Min,Max,STDV\n")
+writeFile.write("\nNo LNC,Min,Max,Mean,STDV\n")
 for x in noLnc.keys():
-	write =  x + ", " + str(mean(noLnc[x])) + "," + str(min(noLnc[x])) + "," + str(max(noLnc[x])) + "," + str(stdv(noLnc[x]))
+	write =  x + ", " + str(min(noLnc[x])) + "," + str(max(noLnc[x])) + "," +str(mean(noLnc[x])) + "," + str(stdv(noLnc[x]))
 	writeFile.write(write+"\n")
 writeFile.close()
