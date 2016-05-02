@@ -21,6 +21,7 @@ message=${sizeTop}"/"${sizeTop}Messages
 output=${sizeTop}"/"${sizeTop}Log
 low=$2
 high=$3
+limiter=$5
 
 # for ((i=1;i<=input;i++)); do 
 # 	while read -r line
@@ -32,7 +33,7 @@ high=$3
 # done
 
 for ((i=$low;i<=$high;i++)); do
-	if (( $i % 10 ))
+	if (( $i % $limiter ))
     	then
 	    if [ $4 -eq 3 ]
 		    then
