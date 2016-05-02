@@ -21,7 +21,7 @@ message=${sizeTop}"/"${sizeTop}Messages
 output=${sizeTop}"/"${sizeTop}Log
 low=$2
 high=$3
-limiter=$4
+limiter=$5
 
 # for ((i=1;i<=input;i++)); do 
 # 	while read -r line
