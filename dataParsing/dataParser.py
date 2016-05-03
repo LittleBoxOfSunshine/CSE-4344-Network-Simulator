@@ -13,7 +13,7 @@ numDestString = "Number of Destinations: "
 latencyString = "has reached destination node"
 activeTicksString = "Total number of active ticks: "
 
-iterations = 2		#Num of iterations of log loops
+iterations = 1000		#Num of iterations of log loops
 
 usingLnc = {}
 noLnc = {}
